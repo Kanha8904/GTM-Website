@@ -40,6 +40,9 @@ const pic = (base, ext, w, h, alt = "", cls = "", eager = false) => `<picture${c
       <img src="${base}@1x.${ext}" srcset="${base}@1x.${ext} 1x, ${base}@2x.${ext} 2x" width="${w}" height="${h}" alt="${esc(alt)}"${eager ? "" : ' loading="lazy"'} decoding="async">
     </picture>`;
 
+/** Hero illustration: the animated workshop room (src/workshop-room.svg). */
+const ROOM = readFileSync(join(here, "workshop-room.svg"), "utf8");
+
 /** Positions for the 3D animations, written by scripts/make-3d.mjs. */
 const animPath = join(here, "..", "public", "img", "3d", "anim.json");
 const ANIM = existsSync(animPath) ? JSON.parse(readFileSync(animPath, "utf8")) : null;
@@ -155,20 +158,7 @@ export function renderPage(c) {
       <p class="lead">${esc(c.hero.sub)}</p>
       <div class="cta-row">${applyBtn("Apply for Cohort 1", "btn-lg")}</div>
     </div>
-    <div class="hero-visual">
-      ${pic("/img/3d/hero-sphere", "png", 200, 200, "", "float f-sphere", true)}
-      ${pic("/img/3d/hero-ring", "png", 200, 150, "", "float f-ring", true)}
-      ${pic("/img/3d/hero-cube", "png", 200, 216, "", "float f-cube", true)}
-      ${pic("/img/3d/hero-pill", "png", 200, 193, "", "float f-pill", true)}
-      <aside class="card buildlog" aria-label="Your engine build log (illustrative)">
-        <ol>${c.hero.buildLog
-          .map(
-            (r, i) => `<li style="--i:${i}"><span class="bl-when">${esc(r.when)}</span><span class="bl-text">${esc(r.text)}</span>${
-              r.gate ? `<span class="pill pill-human">${esc(r.gate.toUpperCase())} ✓</span>` : ""
-            }</li>`
-          )
-          .join("")}</ol>
-      </aside>
+    <div class="hero-visual room"><div class="room-frame">${ROOM}</div>
     </div>
   </div>
 </section>`;

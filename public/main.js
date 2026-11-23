@@ -118,6 +118,57 @@
     $$("[data-close]", d).forEach((b) => b.addEventListener("click", () => d.close()));
   });
 
+  /* ---------- hero: workshop room illustration (people, walk-in, output cards) ---------- */
+  (() => {
+const NS='http://www.w3.org/2000/svg',$=i=>document.getElementById(i);if(!$('rm'))return;
+const OUT=["ICP approved","A-tier: 212 accounts","Signal: new CRO hired","Workflow live","Sequence approved","Reply rate 11.4%","Meeting booked","Deliverability 98%","CRM sync on","Buying committee mapped"];
+const P=[{s:"#C58C5C",h:"#1F2937",c:"#0B1F4D",t:"short",a:"look",d:0},{s:"#E3B592",h:"#6B3A1E",c:"#E2E8F0",t:"long",a:"nod",d:-2},{s:"#8A5A3A",h:"#111827",c:"#475569",t:"short",a:"look",d:-6,lean:1},{s:"#EBC49F",h:"#57534E",c:"#1F2937",t:"bun",a:"look",d:-9},{s:"#B57B4E",h:"#111827",c:"#334155",t:"short",a:"nod",d:-7},{s:"#E3B592",h:"#292524",c:"#7F1D1D",t:"long",a:"look",d:-4},{s:"#8A5A3A",h:"#1F2937",c:"#475569",t:"short",a:"look",d:-11,hand:1},{s:"#C58C5C",h:"#3F2A1D",c:"#0B1F4D",t:"bun",a:"nod",d:-4,lean:1}];
+function arm(p){return '<g class="rz"><rect x="25.5" y="-34" width="10" height="42" rx="5" fill="'+p.c+'"/><rect x="25.5" y="-38" width="10" height="5" fill="#F1F5F9"/><rect x="27" y="-41" width="7" height="2.8" fill="#0F172A"/>'+
+'<rect x="25.7" y="-52" width="9.6" height="12" rx="3.2" fill="'+p.s+'"/>'+[25.7,28.2,30.7,33.2].map((x,i)=>'<rect x="'+x+'" y="'+(-63+[2,0,.6,3][i])+'" width="2.2" height="'+(13-[2,0,.6,3][i])+'" rx="1.1" fill="'+p.s+'"/>').join('')+
+'<rect x="22.2" y="-51" width="3" height="8.5" rx="1.5" fill="'+p.s+'" transform="rotate(-24 23.7 -44)"/></g>'}
+function body(p){
+const hl='<path d="M-9 -42 Q0 -47 9 -42" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".14"/>';
+const hair=p.t=="long"?'<path d="M-15 -30 C-15 -50 15 -50 15 -30 L17 -5 C8 0 -8 0 -17 -5Z" fill="'+p.h+'"/>'+hl:'<circle cx="-13" cy="-28" r="3" fill="'+p.s+'"/><circle cx="13" cy="-28" r="3" fill="'+p.s+'"/><ellipse cx="0" cy="-31" rx="13.2" ry="15" fill="'+p.h+'"/>'+hl+(p.t=="bun"?'<circle cx="0" cy="-48" r="6.5" fill="'+p.h+'"/>':'<path d="M-9 -18 Q0 -14 9 -18 L9 -21 L-9 -21Z" fill="'+p.s+'"/>');
+return '<rect x="-32" y="-54" width="64" height="42" rx="3" fill="#07163A"/><rect x="-28" y="-50" width="56" height="34" rx="2" fill="#2563EB"/><rect x="-23" y="-44" width="14" height="3" rx="1.5" fill="#DBEAFE"/><rect x="14" y="-44" width="9" height="3" rx="1.5" fill="#E11D2E"/>'+
+'<g class="'+(p.lean?'lean':'')+'" style="animation-delay:'+p.d+'s">'+(p.hand?arm(p):'')+'<rect x="-5" y="-21" width="10" height="13" fill="'+p.s+'"/>'+
+'<path d="M-37 74 L-37 14 C-37 -2 -22 -8 -8 -11 L8 -11 C22 -8 37 -2 37 14 L37 74Z" fill="'+p.c+'"/>'+
+'<path d="M0 -11 L8 -11 C22 -8 37 -2 37 14 L37 74 L0 74Z" fill="#000000" opacity=".1"/>'+
+'<path d="M-9 -11 Q0 -5 9 -11 L8 -13 Q0 -8 -8 -13Z" fill="#FFFFFF" opacity=".35"/><line x1="0" y1="-5" x2="0" y2="74" stroke="#000000" opacity=".12"/>'+
+'<g class="hd '+p.a+'" style="animation-delay:'+p.d+'s">'+hair+'</g></g>'+
+'<rect x="-31" y="24" width="62" height="52" rx="13" fill="#111827" opacity=".93"/><rect x="-22" y="34" width="44" height="3" rx="1.5" fill="#374151"/><rect x="-22" y="42" width="44" height="3" rx="1.5" fill="#374151"/><rect x="-22" y="50" width="44" height="3" rx="1.5" fill="#374151"/>'}
+const seats=[];let oi=0,last=-1;
+function add(par,x,y,sc,p){const g=document.createElementNS(NS,'g');g.setAttribute('class','seat');g.setAttribute('transform','translate('+x+','+y+') scale('+sc+')');g.innerHTML=body(p);
+par.appendChild(g);const s={e:g,x,y:y-66*sc};seats.push(s);
+g.addEventListener('mouseenter',()=>{if(g.style.opacity!=='0')card(s,OUT[oi++%OUT.length])})}
+[170,270,370,470].forEach((x,i)=>add($('far'),x,296,.72,P[i]));
+[130,250,370,490].forEach((x,i)=>add($('near'),x,372,1,P[i+4]));
+const me=seats[0];
+function card(s,txt){const w=txt.length*6.2+30,x=s.x-w/2,g=document.createElementNS(NS,'g');g.setAttribute('class','rise');const red=/approved|booked|live|seat/.test(txt);
+g.innerHTML='<rect x="'+(x+1)+'" y="'+(s.y-23)+'" width="'+w+'" height="26" rx="13" fill="#0B1F4D" opacity=".08"/><rect x="'+x+'" y="'+(s.y-26)+'" width="'+w+'" height="26" rx="13" fill="#FFFFFF" stroke="#D5DDEA"/><circle cx="'+(x+13)+'" cy="'+(s.y-13)+'" r="4" fill="'+(red?'#E11D2E':'#2563EB')+'"/><text x="'+(x+23)+'" y="'+(s.y-9)+'" font-size="11" fill="#0B1F4D">'+txt+'</text>';
+$('cards').appendChild(g);setTimeout(()=>g.remove(),4700)}
+function emit(){const pool=seats.map((s,i)=>i).filter(i=>i!==last&&i!==6&&seats[i].e.style.opacity!=='0');const i=pool[Math.floor(Math.random()*pool.length)];last=i;card(seats[i],OUT[oi++%OUT.length])}
+const anim=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(anim){setInterval(()=>{if(!document.hidden)emit()},2400);setTimeout(emit,700);}
+const wk=$('wk'),X0=-50,X1=112,HY=257,STEP=58,SPD=82;
+function pose(f,a){const s=Math.sin(f),c=Math.cos(f);
+$('tA').setAttribute('transform','rotate('+(-25*s*a)+')');$('sA').setAttribute('transform','translate(0,36) rotate('+((4+40*Math.max(0,c))*a)+')');
+$('tB').setAttribute('transform','rotate('+(25*s*a)+')');$('sB').setAttribute('transform','translate(0,36) rotate('+((4+40*Math.max(0,-c))*a)+')');
+$('aA').setAttribute('transform','translate(1,-49) rotate('+(22*s*a)+')');$('eA').setAttribute('transform','translate(0,24) rotate('+(-(8+16*Math.max(0,-s))*a-4)+')');
+$('aB').setAttribute('transform','translate(1,-49) rotate('+(-22*s*a)+')');$('eB').setAttribute('transform','translate(0,24) rotate('+(-(8+16*Math.max(0,s))*a-4)+')');
+$('wb').setAttribute('transform','translate(0,'+(-1.8*Math.cos(2*f)*a)+') rotate('+(2*a)+')')}
+const ez=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function enter(){me.e.style.opacity='0';let x=X0,prev=null,stopT=null;wk.style.opacity='1';
+function fr(t){const dt=prev?Math.min(40,t-prev):16;prev=t;
+if(x<X1){const rem=X1-x;x=Math.min(X1,x+SPD*Math.min(1,.25+rem/40)*dt/1000);pose((x-X0)/STEP*Math.PI,Math.min(1,rem/26));wk.setAttribute('transform','translate('+x+','+HY+')');requestAnimationFrame(fr)}
+else{if(!stopT){stopT=t;pose(0,0)}const k=(t-stopT-450)/1100;
+if(k<0){requestAnimationFrame(fr);return}
+const e=ez(Math.min(1,k));if(k>.25)me.e.style.opacity='1';
+wk.setAttribute('transform','translate('+(X1+(170-X1)*e)+','+(HY+26*e)+') scale('+(1-.22*e)+')');wk.style.opacity=String(1-e);
+if(k<1)requestAnimationFrame(fr);else setTimeout(()=>card(me,'Your seat · Cohort 1'),300)}}
+requestAnimationFrame(fr)}
+if(anim){me.e.style.opacity='0';setTimeout(enter,900);setInterval(()=>{if(!document.hidden)enter()},30000);}
+})();
+
   /* ---------- 3D scenes: start animating when they scroll into view ---------- */
   const scenes = $$(".anim-target, .anim-stones");
   if ("IntersectionObserver" in window) {
