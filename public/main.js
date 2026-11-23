@@ -52,13 +52,6 @@
     if (v) utm[k] = v.slice(0, 200);
   });
 
-  /* ---------- announcement bar ---------- */
-  const annX = $("#ann-x");
-  if (annX) annX.addEventListener("click", () => {
-    document.documentElement.classList.add("ann-off");
-    store.set("ann-dismissed", "1");
-    $(".brand").focus();
-  });
 
   /* ---------- header: shadow on scroll, mobile menu, scroll-spy ---------- */
   const header = $("#site-header");

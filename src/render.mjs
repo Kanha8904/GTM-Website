@@ -148,7 +148,6 @@ export function renderPage(c) {
   }).replace(/</g, "\\u003c");
 
   // ---------- sections (each returns "" when hidden) ----------
-  const seatsText = S.seatsLeft != null && S.seatsLeft !== "" ? ` · ${S.seatsLeft} OF ${seats} SEATS LEFT` : ` · ${seats} SEATS`;
 
   const people = c.faculty.people;
   const hero = `
@@ -517,19 +516,12 @@ export function renderPage(c) {
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css?v=__BUILD__">
 ${ST ? `<style>${stonesCss(ST)}</style>` : ""}
-<script>document.documentElement.classList.add('js');try{if(sessionStorage.getItem('ann-dismissed'))document.documentElement.classList.add('ann-off')}catch(e){}</script>
+<script>document.documentElement.classList.add('js')</script>
 <script type="application/ld+json">${jsonLd}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<div class="announce" id="announce">
-  <div class="wrap ann-row">
-    <p>${esc(`${S.city.toUpperCase()} COHORT 1 · ${S.dates.toUpperCase()}${seatsText}`)}</p>
-    <a href="#apply">APPLY →</a>
-    <button type="button" class="ann-x" id="ann-x" aria-label="Dismiss announcement">${icon("x")}</button>
-  </div>
-</div>
 
 <header class="site-header" id="site-header">
   <div class="wrap nav-row">
