@@ -2,7 +2,7 @@
 // Prerendering keeps the page fast, crawlable and shareable (WhatsApp/LinkedIn
 // previews don't run JavaScript). main.js only adds interactivity on top.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -33,6 +33,41 @@ const art = (name, w, h) => `<picture class="sec-art art-${name}">
       <source type="image/webp" srcset="/img/3d/${name}@1x.webp 1x, /img/3d/${name}@2x.webp 2x">
       <img src="/img/3d/${name}@1x.png" srcset="/img/3d/${name}@1x.png 1x, /img/3d/${name}@2x.png 2x" width="${w}" height="${h}" alt="" loading="lazy" decoding="async">
     </picture>`;
+
+/** Any image under /img: WebP + PNG/JPG fallback at @1x/@2x. */
+const pic = (base, ext, w, h, alt = "", cls = "", eager = false) => `<picture${cls ? ` class="${cls}"` : ""}>
+      <source type="image/webp" srcset="${base}@1x.webp 1x, ${base}@2x.webp 2x">
+      <img src="${base}@1x.${ext}" srcset="${base}@1x.${ext} 1x, ${base}@2x.${ext} 2x" width="${w}" height="${h}" alt="${esc(alt)}"${eager ? "" : ' loading="lazy"'} decoding="async">
+    </picture>`;
+
+/** Positions for the 3D animations, written by scripts/make-3d.mjs. */
+const animPath = join(here, "..", "public", "img", "3d", "anim.json");
+const ANIM = existsSync(animPath) ? JSON.parse(readFileSync(animPath, "utf8")) : null;
+
+/** CSS keyframes for the stepping-stone hop and the gate pulses, built from the stone positions. */
+function stonesCss(st) {
+  const [x0, y0] = st.tops[0];
+  const T = 9; // seconds per loop
+  const land = (i) => 8 + i * 9; // % of the loop at which the ball lands on stone i (stone 7 at 71%)
+  const at = (i) => `translate(${(st.tops[i][0] - x0).toFixed(2)}%, ${(st.tops[i][1] - y0).toFixed(2)}%)`;
+  const lift = 9; // hop height, % of the box
+  let k = `0%{opacity:0;transform:${at(0)} translateY(-${lift * 2}%)}5%{opacity:1;transform:${at(0)} translateY(-${lift * 2}%)}${land(0)}%{transform:${at(0)}}`;
+  for (let i = 1; i < 8; i++) {
+    const mid = (land(i - 1) + land(i)) / 2;
+    const mx = ((st.tops[i - 1][0] + st.tops[i][0]) / 2 - x0).toFixed(2);
+    const my = ((st.tops[i - 1][1] + st.tops[i][1]) / 2 - y0 - lift).toFixed(2);
+    k += `${mid}%{transform:translate(${mx}%, ${my}%)}${land(i)}%{transform:${at(i)}}`;
+  }
+  k += `88%{opacity:1;transform:${at(7)}}94%{opacity:0;transform:${at(7)} scale(.6)}100%{opacity:0;transform:${at(7)} scale(.6)}`;
+  let css = `@keyframes hop{${k}}.anim-stones.in-view .ball img{animation:hop ${T}s cubic-bezier(.45,0,.55,1) .9s infinite}`;
+  css += `@media (prefers-reduced-motion: reduce){.anim-stones .ball img{transform:${at(7)}}}`;
+  for (const g of st.gates) {
+    const l = land(g);
+    css += `@keyframes gate${g}{0%,${l - 1}%{transform:none;filter:none}${l + 1}%{transform:translateY(2.5%);filter:brightness(1.25) drop-shadow(0 0 10px rgba(225,6,0,.55))}${l + 6}%{transform:none;filter:brightness(1.1) drop-shadow(0 0 6px rgba(225,6,0,.35))}${l + 14}%,100%{transform:none;filter:none}}`;
+    css += `.anim-stones.in-view .s${g} img{animation:gate${g} ${T}s linear .9s infinite}`;
+  }
+  return css;
+}
 
 const initials = (name) => name.replace(/[^\p{L}\s]/gu, "").split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 const digits = (s) => String(s || "").replace(/[^\d]/g, "");
@@ -115,40 +150,77 @@ export function renderPage(c) {
   // ---------- sections (each returns "" when hidden) ----------
   const seatsText = S.seatsLeft != null && S.seatsLeft !== "" ? ` · ${S.seatsLeft} OF ${seats} SEATS LEFT` : ` · ${seats} SEATS`;
 
+  const people = c.faculty.people;
   const hero = `
 <section class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <h1>${esc(c.hero.h1Before)}<span class="grad">${esc(c.hero.h1Gradient)}</span></h1>
       <p class="lead">${esc(c.hero.sub)}</p>
-      <div class="cta-row">${applyBtn()}${fitBtn()}</div>
+      <div class="cta-row">${applyBtn("Apply for Cohort 1", "btn-lg")}${fitBtn("Book a 15-min fit call", "btn-lg")}</div>
+      <div class="hero-proof">
+        <ul class="avatar-stack" aria-hidden="true">${people
+          .filter((f) => f.photo)
+          .map((f) => `<li>${pic("/img/people/" + f.photo, "jpg", 40, 40, "", "", true)}</li>`)
+          .join("")}</ul>
+        <p><span class="stars" aria-hidden="true">★★★★★</span> <strong>${esc(S.clutchRating)} on Clutch</strong><span class="hp-sep" aria-hidden="true">·</span>Taught by the team that runs LeadStrategus</p>
+      </div>
     </div>
-    <aside class="card buildlog" aria-label="Your engine build log (illustrative)">
-      <div class="bl-head"><span>YOUR ENGINE · BUILD LOG</span><span class="tag">ILLUSTRATIVE</span></div>
-      <ol>${c.hero.buildLog
-        .map(
-          (r, i) => `<li style="--i:${i}"><span class="bl-when">${esc(r.when)}</span><span class="bl-text">${esc(r.text)}</span>${
-            r.gate ? `<span class="pill pill-human">${esc(r.gate.toUpperCase())} ✓</span>` : ""
-          }</li>`
-        )
-        .join("")}</ol>
-    </aside>
+    <div class="hero-visual">
+      ${pic("/img/3d/hero-sphere", "png", 200, 200, "", "float f-sphere", true)}
+      ${pic("/img/3d/hero-ring", "png", 200, 150, "", "float f-ring", true)}
+      ${pic("/img/3d/hero-cube", "png", 200, 216, "", "float f-cube", true)}
+      ${pic("/img/3d/hero-pill", "png", 200, 193, "", "float f-pill", true)}
+      <aside class="card buildlog" aria-label="Your engine build log (illustrative)">
+        <div class="bl-head"><span><span class="live-dot" aria-hidden="true"></span>YOUR ENGINE · BUILD LOG</span><span class="tag">ILLUSTRATIVE</span></div>
+        <ol>${c.hero.buildLog
+          .map(
+            (r, i) => `<li style="--i:${i}"><span class="bl-when">${esc(r.when)}</span><span class="bl-text">${esc(r.text)}</span>${
+              r.gate ? `<span class="pill pill-human">${esc(r.gate.toUpperCase())} ✓</span>` : ""
+            }</li>`
+          )
+          .join("")}</ol>
+      </aside>
+    </div>
   </div>
   <div class="wrap">
     <ol class="steps-strip">${c.hero.steps.map((s, i) => `<li><span class="ss-n">0${i + 1}</span><span class="ss-t">${esc(s)}</span></li>`).join("")}</ol>
   </div>
 </section>`;
 
+  const logoItems = (hidden) =>
+    c.clients
+      .map((cl) => `<li>${pic("/img/clients/" + cl.logo, "png", Math.round(cl.h * (cl.ratio || 3)), cl.h, hidden ? "" : cl.name)}</li>`)
+      .join("");
   const trusted = S.showClientLogos
-    ? { id: "trusted", cls: "trusted", html: `<p class="kicker">Trusted by B2B teams at</p><ul class="client-logos">${c.clients
-        .map((cl) => `<li>${cl.logo ? `<img src="${esc(cl.logo)}" alt="${esc(cl.name)}" height="32" loading="lazy">` : esc(cl.name)}</li>`)
-        .join("")}</ul>` }
+    ? {
+        id: "trusted",
+        cls: "trusted",
+        wide: true,
+        html: `<p class="trusted-h">Trusted by B2B teams at</p>
+    <div class="marquee"><div class="marquee-track"><ul>${logoItems(false)}</ul><ul aria-hidden="true">${logoItems(true)}</ul></div></div>`,
+      }
     : null;
 
+  const T3 = ANIM && ANIM.target;
+  const targetArt = T3
+    ? `<div class="anim-target" aria-hidden="true" style="--bx:${T3.bull[0]}%;--by:${T3.bull[1]}%;--fx:${((T3.tail[0] - T3.bull[0]) * 1.1).toFixed(2)}%;--fy:${((T3.tail[1] - T3.bull[1]) * 1.1).toFixed(2)}%">
+        <div class="board">${pic("/img/3d/target-board", "png", T3.w, T3.h)}</div>
+        <span class="ripple"></span><span class="ripple r2"></span>
+        <div class="arrow">${pic("/img/3d/target-arrow", "png", T3.w, T3.h)}</div>
+      </div>`
+    : "";
+  const ST = ANIM && ANIM.stones;
+  const stonesArt = ST
+    ? `<div class="anim-stones" aria-hidden="true">${[...Array(8)]
+        .map((_, i) => `<div class="stone s${i}${ST.gates.includes(i) ? " gate" : ""}" style="--d:${i * 70}ms">${pic("/img/3d/stones-stone" + i, "png", ST.w, ST.h)}</div>`)
+        .join("")}<div class="ball">${pic("/img/3d/stones-ball", "png", ST.w, ST.h)}</div></div>`
+    : "";
   const why = {
     id: "why",
     html: `
-    <div class="sec-head with-art"><div><h2>${esc(c.why.h2)}</h2><p class="sec-sub">${esc(c.why.intro)}</p></div>${art("target", 398, 378)}</div>
+    <div class="sec-head with-art"><div><h2>${esc(c.why.h2)}</h2><p class="sec-sub">${esc(c.why.intro)}</p></div>${targetArt}</div>
     <div class="cols-3">${c.why.cols.map((k) => `<article class="card why-card">${icon(k.icon, "ic-lg")}<h3>${esc(k.title)}</h3><p>${esc(k.text)}</p></article>`).join("")}</div>`,
   };
 
@@ -156,7 +228,7 @@ export function renderPage(c) {
   const programme = {
     id: "programme",
     html: `
-    <div class="sec-head with-art wide-art"><div><h2>${esc(c.programme.h2)}</h2><p class="sec-sub">${esc(c.programme.intro)}</p></div>${art("pipeline", 500, 123)}</div>
+    <div class="sec-head with-art wide-art"><div><h2>${esc(c.programme.h2)}</h2><p class="sec-sub">${esc(c.programme.intro)}</p></div>${stonesArt}</div>
     <div class="ptable-wrap">
       <table class="ptable">
         <caption class="sr-only">The 8 stages: what you build, the tools, what you leave with, and who is in control</caption>
@@ -172,7 +244,7 @@ export function renderPage(c) {
           .join("")}</tbody>
       </table>
     </div>
-    <p class="note">${icon("settings-2")} ${esc(c.programme.note)}</p>`,
+    <p class="note">${esc(c.programme.note)}</p>`,
   };
 
   const days = {
@@ -195,15 +267,6 @@ export function renderPage(c) {
     <ol class="timeline">${c.month.weeks.map((w, i) => `<li><span class="tl-dot" aria-hidden="true">${i + 1}</span><span class="tl-wk">WEEK ${i + 1}</span><span class="tl-t">${esc(w)}</span></li>`).join("")}</ol>`,
   };
 
-  const stack = {
-    id: "stack",
-    html: `
-    <div class="sec-head with-art"><div><h2>${esc(c.stack.h2)}</h2></div>${art("layers", 371, 329)}</div>
-    <ul class="stack-cols">${c.stack.cols.map((s) => `<li class="card"><span class="tag-line">${esc(s.label)}</span><span class="stack-tool">${esc(s.tools)}</span></li>`).join("")}</ul>
-    <p class="demo-only"><span class="tag-line">DEMO ONLY</span> ${esc(c.stack.demoOnly)}</p>
-    <p class="footnote">Tool names and logos are used for illustration only. We do not own these trademarks.</p>`,
-  };
-
   const who = {
     id: "who",
     html: `
@@ -218,43 +281,48 @@ export function renderPage(c) {
     <p class="note note-strong">${esc(c.who.note)}</p>`,
   };
 
-  const stars = `<span class="stars" aria-label="5 out of 5 stars">★★★★★</span>`;
+  const stars = `<span class="stars" aria-hidden="true">★★★★★</span>`;
+  const T = c.proof.testimonials;
   const proof = {
     id: "proof",
-    cls: S.showTestimonials ? "" : "proof-slim",
+    cls: S.showTestimonials ? "proof" : "proof-slim",
     html: S.showTestimonials
       ? `
     <div class="proof-head">
       <h2>${esc(c.proof.h2)}</h2>
-      <a class="clutch" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${stars} ${esc(c.proof.badge)} ${icon("arrow-up-right", "ic-sm")}</a>
+      <a class="clutch-line" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${stars} ${esc(c.proof.badge)} ${icon("arrow-up-right", "ic-sm")}</a>
     </div>
-    <div class="carousel" data-carousel>
-      <ul class="car-track" tabindex="0" aria-label="Client reviews from Clutch">${c.proof.testimonials
-        .map((t) => `<li class="card quote"><span class="stars" aria-hidden="true">★★★★★</span><blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-name">${esc(t.name)}</p><p class="q-role">${esc(t.role)}</p></li>`)
-        .join("")}</ul>
-      <div class="car-ctrl">
-        <button type="button" class="car-btn" data-dir="-1" aria-label="Previous reviews">${icon("arrow-right", "flip")}</button>
-        <button type="button" class="car-btn" data-dir="1" aria-label="Next reviews">${icon("arrow-right")}</button>
+    <div class="slider" data-slider role="region" aria-roledescription="carousel" aria-label="Client reviews from Clutch">
+      <div class="slider-view">
+        <div class="slider-track">${T.map(
+          (t, i) => `<div class="slide card${i === 0 ? " is-active" : ""}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}">${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-name">${esc(t.name)}</p><p class="q-role">${esc(t.role)}</p></div>`
+        ).join("")}</div>
+      </div>
+      <div class="slider-ctrl">
+        <button type="button" class="car-btn" data-dir="-1" aria-label="Previous review">${icon("arrow-right", "flip")}</button>
+        <div class="dots">${T.map((_, i) => `<button type="button" class="dot${i === 0 ? " on" : ""}" data-i="${i}" aria-label="Show review ${i + 1}"${i === 0 ? ' aria-current="true"' : ""}></button>`).join("")}</div>
+        <button type="button" class="car-btn" data-dir="1" aria-label="Next review">${icon("arrow-right")}</button>
       </div>
     </div>`
-      : `<div class="proof-head"><a class="clutch" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${stars} ${esc(c.proof.badge)} ${icon("arrow-up-right", "ic-sm")}</a></div>`,
+      : `<div class="proof-head"><a class="clutch-line" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${stars} ${esc(c.proof.badge)} ${icon("arrow-up-right", "ic-sm")}</a></div>`,
   };
 
-  const photo = (f) =>
+  const photo = (f, size = 88) =>
     f.photo
-      ? `<picture class="avatar-wrap"><source type="image/webp" srcset="/img/people/${f.photo}@1x.webp 1x, /img/people/${f.photo}@2x.webp 2x"><img class="avatar" src="/img/people/${f.photo}@1x.jpg" srcset="/img/people/${f.photo}@1x.jpg 1x, /img/people/${f.photo}@2x.jpg 2x" alt="${esc(f.name)}" width="104" height="104" loading="lazy" decoding="async"></picture>`
+      ? pic("/img/people/" + f.photo, "jpg", size, size, f.name, "avatar-wrap").replace("<img ", '<img class="avatar" ')
       : `<span class="avatar avatar-ph" aria-hidden="true">${initials(f.name)}</span>`;
+  const first = (f) => f.name.split(" ")[0];
   const faculty = {
     id: "faculty",
     html: `
     <div class="sec-head"><h2>${esc(c.faculty.h2)}</h2><p class="sec-sub">${esc(c.faculty.sub)}</p></div>
-    <div class="team">${c.faculty.people
+    <div class="team">${people
       .map(
-        (f) => `<article class="card person">
+        (f, k) => `<article class="card person">
           <div class="person-top">${photo(f)}<p class="person-role">${esc(f.role)}</p></div>
           <h3>${esc(f.name)}</h3>
           <p class="person-bio">${esc(f.bio)}</p>
-          ${f.more ? `<a class="more" href="${esc(f.more)}" target="_blank" rel="noopener">More about ${esc(f.name.split(" ")[0])} ${icon("arrow-up-right", "ic-sm")}</a>` : ""}
+          ${f.long && f.long.length ? `<button type="button" class="more" data-modal="person-${k}">More about ${esc(first(f))} ${icon("arrow-up-right", "ic-sm")}</button>` : ""}
           ${f.linkedin || f.email ? `<div class="person-links">${f.linkedin ? `<a class="icon-btn" href="${esc(f.linkedin)}" target="_blank" rel="noopener" aria-label="${esc(f.name)} on LinkedIn">${icon("linkedin")}</a>` : ""}${
             f.email ? `<a class="icon-btn" href="mailto:${esc(f.email)}" aria-label="Email ${esc(f.name)}">${icon("mail")}</a>` : ""
           }</div>` : ""}
@@ -262,6 +330,21 @@ export function renderPage(c) {
       )
       .join("")}</div>`,
   };
+  const personDialogs = people
+    .map((f, k) =>
+      f.long && f.long.length
+        ? `<dialog class="modal person-modal" id="modal-person-${k}" aria-labelledby="pm-${k}">
+  <button type="button" class="modal-x floating" data-close aria-label="Close">${icon("x")}</button>
+  <div class="pm-head">${photo(f, 104)}<div><p class="person-role">${esc(f.role)}</p><h2 id="pm-${k}">${esc(f.name)}</h2></div></div>
+  <p class="pm-lead">${esc(f.bio)}</p>
+  <div class="pm-body">${f.long.map((t) => `<p>${esc(t)}</p>`).join("")}</div>
+  <ul class="pm-links">${f.linkedin ? `<li><a href="${esc(f.linkedin)}" target="_blank" rel="noopener">${icon("linkedin")} Connect on LinkedIn</a></li>` : ""}${
+            f.email ? `<li><a href="mailto:${esc(f.email)}">${icon("mail")} ${esc(f.email)}</a></li>` : ""
+          }</ul>
+</dialog>`
+        : ""
+    )
+    .join("\n");
 
   const checklist = {
     id: "checklist",
@@ -306,7 +389,6 @@ export function renderPage(c) {
         <p class="price-val price-req">On request</p>
         <ul class="ticks"><li>${icon("check")}At your office or ours</li><li>${icon("check")}Built around your stack</li><li>${icon("check")}Unlimited review slots</li></ul>
         <a class="btn btn-ghost btn-block" href="#apply" data-apply-type="private">Talk to us ${icon("arrow-right")}</a>
-        <p class="price-alt">or email <a href="mailto:${esc(S.contactEmail)}">${esc(S.contactEmail)}</a>${wa ? ` · <a href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}</p>
       </article>
     </div>`,
   };
@@ -320,7 +402,6 @@ export function renderPage(c) {
         <h2 class="h2-bar">${esc(A.h2)}</h2>
         <p class="sec-sub">${esc(A.sub)}</p>
         <ul class="trust">${A.trust.map((t) => `<li>${icon("check")}${esc(t)}</li>`).join("")}</ul>
-        <p class="apply-contact">Questions first? <a href="mailto:${esc(S.contactEmail)}">${esc(S.contactEmail)}</a>${wa ? ` · <a href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp us</a>` : ""}</p>
       </div>
       <div class="card form-card" id="form-card">
         <form id="apply-form" name="workshop-apply" method="POST" data-netlify="true" netlify-honeypot="company_url_confirm" novalidate>
@@ -393,7 +474,7 @@ export function renderPage(c) {
   };
 
   // Alternate white / silver backgrounds across whichever sections are shown.
-  const sections = [trusted, why, programme, days, month, stack, who, proof, faculty, checklist, pricing, apply, faq, finalCta].filter(Boolean);
+  const sections = [why, programme, days, month, who, proof, faculty, checklist, pricing, apply, faq, finalCta].filter(Boolean);
   const body = sections
     .map(
       (s, i) => `
@@ -444,6 +525,7 @@ export function renderPage(c) {
 <link rel="preload" href="/fonts/montserrat.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css?v=__BUILD__">
+${ST ? `<style>${stonesCss(ST)}</style>` : ""}
 <script>document.documentElement.classList.add('js');try{if(sessionStorage.getItem('ann-dismissed'))document.documentElement.classList.add('ann-off')}catch(e){}</script>
 <script type="application/ld+json">${jsonLd}</script>
 </head>
@@ -476,6 +558,7 @@ export function renderPage(c) {
 
 <main id="main">
 ${hero}
+${trusted ? `<section class="trusted" id="trusted" aria-label="Clients">${trusted.html}</section>` : ""}
 ${body}
 </main>
 
@@ -483,14 +566,16 @@ ${body}
   <div class="wrap foot-grid">
     <div class="foot-brand">
       <a class="foot-logo" href="#top">${logo("leadstrategus-logo-horizontal", 227, 56, "LeadStrategus logo")}</a>
-      <p class="foot-note">The GTM Engineering Workshop is part of <a href="https://leadstrategus.ai/" target="_blank" rel="noopener">LeadStrategus.ai</a>.</p>
-      <ul class="foot-sites">
-        <li><a href="https://leadstrategus.ai/" rel="noopener" target="_blank">leadstrategus.ai</a></li>
-        <li><a href="https://www.leadstrategus.com/" rel="noopener" target="_blank">leadstrategus.com</a></li>
-        <li><a href="https://expotofunnel.com/" rel="noopener" target="_blank">expotofunnel.com</a></li>
-      </ul>
+      <p class="foot-about">${esc(c.footer.about)}</p>
+      <a class="agents-pill" href="https://leadstrategus.ai/" target="_blank" rel="noopener">${esc(c.footer.agentsCta)} ${icon("arrow-up-right", "ic-sm")}</a>
     </div>
-    <div class="foot-contact">
+    <div class="foot-col">
+      <h2 class="foot-h">LeadStrategus</h2>
+      <ul class="foot-sites">${c.footer.sites
+        .map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener"><span class="fs-name">${esc(x.name)} ${icon("arrow-up-right", "ic-sm")}</span><span class="fs-text">${esc(x.text)}</span></a></li>`)
+        .join("")}</ul>
+    </div>
+    <div class="foot-col foot-contact">
       <h2 class="foot-h">Contact</h2>
       <a class="foot-mail" href="mailto:${esc(S.contactEmail)}">${esc(S.contactEmail)}</a>
       ${S.address ? `<address>${esc(S.address)}</address>` : ""}
@@ -500,13 +585,14 @@ ${body}
         <a class="clutch-pill" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${icon("star", "star-ic")} ${esc(S.clutchRating)} on Clutch</a>
       </div>
     </div>
-    <ul class="foot-legal">
-      <li><button type="button" class="linkish" data-modal="privacy">Privacy</button></li>
-      <li><button type="button" class="linkish" data-modal="terms">Terms</button></li>
-    </ul>
   </div>
-  <div class="wrap foot-base"><p>© 2026 LeadStrategus Private Limited · ${esc(S.city)}, India</p></div>
+  <div class="wrap foot-base">
+    <p>© 2026 LeadStrategus Private Limited · ${esc(S.city)}, India</p>
+    <ul class="foot-legal"><li><button type="button" class="linkish" data-modal="privacy">Privacy</button></li><li><button type="button" class="linkish" data-modal="terms">Terms</button></li></ul>
+    <p class="foot-tm">Tool names are used for illustration only. We do not own these trademarks.</p>
+  </div>
 </footer>
+${personDialogs}
 
 <div class="mobile-bar" id="mobile-bar">${applyBtn(`Apply for Cohort 1 <span class="mb-sub">· ${seats} seats</span>`, "btn-block")}</div>
 

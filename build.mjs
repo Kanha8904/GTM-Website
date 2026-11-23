@@ -31,5 +31,12 @@ for (const re of banned) for (const m of text.matchAll(new RegExp(re.source, re.
   }
 }
 
+// House style: no em dashes in the copy.
+const dash = text.indexOf("—");
+if (dash >= 0) {
+  console.error(`✖ Em dash found in the copy: "…${text.slice(Math.max(0, dash - 40), dash + 20).trim()}…". Use a comma, period, parentheses or semicolon.`);
+  process.exit(1);
+}
+
 writeFileSync(new URL("index.html", out), html);
 console.log(`✔ Built dist/index.html (${(html.length / 1024).toFixed(1)} KB)`);

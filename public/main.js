@@ -119,24 +119,48 @@
     $$("[data-close]", d).forEach((b) => b.addEventListener("click", () => d.close()));
   });
 
-  /* ---------- review carousel (scroll-snap; buttons move one card) ---------- */
-  $$("[data-carousel]").forEach((car) => {
-    const track = $(".car-track", car);
-    const [prev, next] = $$(".car-btn", car);
-    const sync = () => {
-      prev.disabled = track.scrollLeft <= 2;
-      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+  /* ---------- 3D scenes: start animating when they scroll into view ---------- */
+  const scenes = $$(".anim-target, .anim-stones");
+  if ("IntersectionObserver" in window) {
+    const so = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle("in-view", e.isIntersecting)), { threshold: 0.35 });
+    scenes.forEach((el) => so.observe(el));
+  } else scenes.forEach((el) => el.classList.add("in-view"));
+
+  /* ---------- review slider: centred card, dots, arrows, swipe, gentle autoplay ---------- */
+  $$("[data-slider]").forEach((root) => {
+    const view = $(".slider-view", root), track = $(".slider-track", root);
+    const slides = $$(".slide", root), dots = $$(".dot", root);
+    const n = slides.length;
+    let idx = 0, timer = null, hover = false, visible = false;
+    const place = () => {
+      const s = slides[idx];
+      track.style.transform = `translateX(${view.clientWidth / 2 - (s.offsetLeft + s.offsetWidth / 2)}px)`;
     };
-    const step = (dir) => {
-      const card = track.firstElementChild;
-      const gap = parseFloat(getComputedStyle(track).columnGap) || 16;
-      track.scrollBy({ left: dir * (card.getBoundingClientRect().width + gap), behavior: reduceMotion ? "auto" : "smooth" });
+    const go = (i) => {
+      idx = (i + n) % n;
+      slides.forEach((s, k) => { s.classList.toggle("is-active", k === idx); s.setAttribute("aria-hidden", String(k !== idx)); });
+      dots.forEach((d, k) => { d.classList.toggle("on", k === idx); k === idx ? d.setAttribute("aria-current", "true") : d.removeAttribute("aria-current"); });
+      place();
     };
-    prev.addEventListener("click", () => step(-1));
-    next.addEventListener("click", () => step(1));
-    track.addEventListener("scroll", sync, { passive: true });
-    window.addEventListener("resize", sync);
-    sync();
+    const stop = () => { clearInterval(timer); timer = null; };
+    const start = () => { stop(); if (!reduceMotion && visible && !hover) timer = setInterval(() => go(idx + 1), 6000); };
+    $$(".car-btn", root).forEach((b) => b.addEventListener("click", () => { go(idx + +b.dataset.dir); start(); }));
+    dots.forEach((d) => d.addEventListener("click", () => { go(+d.dataset.i); start(); }));
+    slides.forEach((s, k) => s.addEventListener("click", () => { if (k !== idx) { go(k); start(); } }));
+    root.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { e.preventDefault(); go(idx + 1); start(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); go(idx - 1); start(); }
+    });
+    let x0 = null;
+    view.addEventListener("pointerdown", (e) => { x0 = e.clientX; });
+    view.addEventListener("pointerup", (e) => { if (x0 != null && Math.abs(e.clientX - x0) > 40) { go(idx + (e.clientX < x0 ? 1 : -1)); start(); } x0 = null; });
+    root.addEventListener("mouseenter", () => { hover = true; stop(); });
+    root.addEventListener("mouseleave", () => { hover = false; start(); });
+    root.addEventListener("focusin", () => { hover = true; stop(); });
+    root.addEventListener("focusout", () => { hover = false; start(); });
+    if ("IntersectionObserver" in window) new IntersectionObserver((es) => { visible = es[0].isIntersecting; visible ? start() : stop(); }, { threshold: 0.3 }).observe(root);
+    window.addEventListener("resize", place);
+    go(0);
   });
 
   /* ---------- shared POST helper ---------- */

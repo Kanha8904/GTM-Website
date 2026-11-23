@@ -34,7 +34,7 @@ export default {
     clutchUrl: "https://clutch.co/profile/leadstrategus",
     checklistEndpoint: "", // where the checklist email-capture POSTs JSON {email}. Empty = no capture, link shown straight away.
     checklistPdfUrl: "", // TODO URL of the "8 questions" PDF. Empty = "we'll email it to you".
-    showClientLogos: false, // "Trusted by" strip: turn on only with client permission
+    showClientLogos: true, // "Trusted by" strip, same logos as leadstrategus.com
     showTestimonials: true, // Clutch reviews, as published on leadstrategus.ai
     contactEmail: "kingshuk@leadstrategus.com", // same contact address as leadstrategus.com
     address: "Bizzhub, Brigade Tech Park, near ITPL Main Road, Pattandur Agrahara, Whitefield, Bengaluru, Karnataka 560066",
@@ -52,7 +52,7 @@ export default {
     name: "GTM Engineering Workshop",
     title: "GTM Engineering Workshop, Bengaluru | LeadStrategus",
     description:
-      "5-day in-person GTM engineering workshop in Bengaluru + 4 weeks of guided implementation. Design, build and test your own outbound engine — ICP, signals, scoring, messaging and measurement. 12 seats.",
+      "5-day in-person GTM engineering workshop in Bengaluru + 4 weeks of guided implementation. Design, build and test your own outbound engine: ICP, signals, scoring, messaging and measurement. 12 seats.",
     ogImage: "/img/og-image.png",
   },
 
@@ -75,7 +75,7 @@ export default {
   hero: {
     h1Before: "Outbound, ",
     h1Gradient: "engineered.",
-    sub: "Beyond the AI hype. Design, build and test a complete outbound prospecting engine for your own business — target logic, signals, scoring, messaging and measurement. Taught by operators who ran marketing at AWS, Gartner and SAP.",
+    sub: "Beyond the AI hype. Design, build and test a complete outbound prospecting engine for your own business: target logic, signals, scoring, messaging and measurement. Taught by operators who ran marketing at AWS, Gartner and SAP.",
     buildLog: [
       { when: "DAY 1", text: "ICP + segments chosen", gate: "gate 1" },
       { when: "DAY 2", text: "Signal model set; accounts ranked A/B/C", gate: "gate 2" },
@@ -87,13 +87,25 @@ export default {
     steps: ["Define the market", "Score on buying signals", "Launch, measure, improve"],
   },
 
-  clients: [{ name: "Client 1" }, { name: "Client 2" }, { name: "Client 3" }, { name: "Client 4" }, { name: "Client 5" }], // add logo: "/brand/clients/x.svg"
+  // "Trusted by" strip (logos as shown on leadstrategus.com). h = display height in px, tuned for equal visual weight.
+  clients: [
+    { name: "EY", logo: "ey", h: 40, ratio: 0.975 },
+    { name: "Stibo Systems", logo: "stibo", h: 30, ratio: 7.6 },
+    { name: "Alibaba Cloud", logo: "alibaba-cloud", h: 28, ratio: 7.8 },
+    { name: "Dover", logo: "dover", h: 36, ratio: 2.925 },
+    { name: "Indus Net Technologies", logo: "int", h: 42, ratio: 1.0 },
+    { name: "Speridian Technologies", logo: "speridian", h: 36, ratio: 4.075 },
+    { name: "SOAIS", logo: "soais", h: 24, ratio: 5.85 },
+    { name: "AskMeIdentity", logo: "askmeidentity", h: 32, ratio: 5.675 },
+    { name: "Schrocken", logo: "schrocken", h: 42, ratio: 1.05 },
+    { name: "Retigence", logo: "retigence", h: 32, ratio: 3.525 },
+  ],
 
   why: {
     h2: "Same tools. Different system.",
     intro: "AI made outbound easier to assemble, not easier to win. When everyone uses the same models, data and prompts, outbound converges. Three things decide who books the meeting.",
     cols: [
-      { icon: "target", title: "A sharper view of who buys, and why now.", text: "Signals that predict a purchase in your market — not just signals that are interesting." },
+      { icon: "target", title: "A sharper view of who buys, and why now.", text: "Signals that predict a purchase in your market, not just signals that are interesting." },
       { icon: "shield-check", title: "Human judgement at three gates.", text: "AI does research, data and drafting. You decide segments, buying criteria and every message." },
       { icon: "refresh-cw", title: "A loop that learns.", text: "Replies and meetings feed back into targeting, scoring and messaging every cycle." },
     ],
@@ -119,7 +131,7 @@ export default {
     h2: "5 days to build. 1 month to implement.",
     summary: [
       { tag: "IN PERSON · BENGALURU", big: "5", unit: "days", text: "Principles in the morning. Building on your own business in the afternoon. Demo day on Friday." },
-      { tag: "ONLINE · 2 × 1 HR A WEEK", big: "4", unit: "weeks", text: "First sends, replies, refinement and a 90-day plan — with our team reviewing your engine." },
+      { tag: "ONLINE · 2 × 1 HR A WEEK", big: "4", unit: "weeks", text: "First sends, replies, refinement and a 90-day plan, with our team reviewing your engine." },
     ],
     subhead: "The 5 days. Something built every day.",
     list: [
@@ -135,18 +147,6 @@ export default {
     h2: "The month after. Real sends, reviewed.",
     sub: "Two live 1-hour sessions a week, online. Private review slots if your data can't be shared.",
     weeks: ["Scope and data review", "First sends and deliverability", "Replies, results, refine", "Final demo and 90-day plan"],
-  },
-
-  stack: {
-    h2: "A lean stack. Chosen by job.",
-    cols: [
-      { label: "REASONING", tools: "Claude · ChatGPT" },
-      { label: "DATA", tools: "Apollo.io" },
-      { label: "ORCHESTRATION", tools: "n8n" },
-      { label: "SENDING", tools: "Instantly" },
-      { label: "SYSTEM OF RECORD", tools: "HubSpot" },
-    ],
-    demoOnly: "Clay · Claude Code",
   },
 
   who: {
@@ -178,28 +178,55 @@ export default {
   faculty: {
     h2: "An operating firm that trains.",
     sub: "Everything we teach, we run for clients every week.",
+    // "long" paragraphs appear in the "More about" profile window.
     people: [
       {
         name: "Kingshuk Hazra", role: "Founder", photo: "kingshuk-hazra",
         bio: "Former Head of Marketing, Amazon Web Services India. Two decades across marketing, business-development analytics and advisory at SAP, Oracle, IBM, Gartner, Pluralsight and IMRB.",
-        more: "https://www.leadstrategus.com/about", linkedin: "https://www.linkedin.com/in/kingshuk/", email: "kingshuk@leadstrategus.com",
+        long: [
+          "Kingshuk founded LeadStrategus in 2018 after leading marketing for Amazon Web Services in India and, before that, holding progressively senior roles across marketing, BD analytics and advisory at SAP, Oracle Consulting, IBM, Gartner, Pluralsight (Director, Enterprise Marketing) and IMRB.",
+          "A statistics graduate with an MBA from the Indian Institute of Foreign Trade, Kingshuk is the reason every LeadStrategus engagement starts with the numbers and ends with a forecast someone is prepared to defend.",
+          "Kingshuk writes and speaks on demand generation, intent data and the practical use of AI agents in B2B go-to-market, and still personally runs the diagnostic phase of most GTM strategy engagements.",
+        ],
+        linkedin: "https://www.linkedin.com/in/kingshuk/", email: "kingshuk@leadstrategus.com",
       },
       {
         name: "Anindita Hazra", role: "Co-founder", photo: "anindita-hazra",
         bio: "Co-founder of LeadStrategus. Leads client delivery across demand generation and sales enablement.",
-        more: "https://www.leadstrategus.com/about", linkedin: "https://www.linkedin.com/in/aninditahazra/", email: "anindita@leadstrategus.com",
+        long: [
+          "Anindita co-founded LeadStrategus and leads client delivery: the pods, the programmes and the weekly pipeline reviews that keep the firm accountable for meetings rather than activity.",
+          "Anindita's background spans marketing operations, content and programme management for technology companies.",
+        ],
+        linkedin: "https://www.linkedin.com/in/aninditahazra/", email: "anindita@leadstrategus.com",
       },
       {
         name: "Komala Maran", role: "Head Go-To-Market & Growth", photo: "komala-maran",
         bio: "Leads Go-To-Market and Market Intelligence at LeadStrategus. Built the firm’s Market Insights and Open Source Intelligence practice. An IT engineer from IIIT Allahabad.",
-        more: "https://www.leadstrategus.com/about", linkedin: "https://www.linkedin.com/in/komalamaran/", email: "komala.m@leadstrategus.com",
+        long: [
+          "Komala joined LeadStrategus in 2019 and has grown with the firm from Smarketing consultant to Manager of its Market Insights and Open Source Intelligence practice, and now to Head of Go-To-Market. She runs the intelligence engine behind client engagements: the market selection, opportunity assessment, ICP development and account prioritisation that decide who a client should go after, and when. Her work spans international market entry, buyer and competitive intelligence, and intelligence-led demand generation for B2B and technology companies.",
+          "An engineer by training, Komala is the reason a LeadStrategus target list comes with a why attached to every account: what changed at that company, why now, and how to start the conversation.",
+          "She leads the firm’s use of generative AI and AI agents across research and GTM workflows, and runs LeadStrategus masterclasses on using open-source intelligence to find and research prospects. Outside work, she founded Project Yaadhum and mentors students through the Ministry of Education’s Vidyanjali programme.",
+        ],
+        linkedin: "https://www.linkedin.com/in/komalamaran/", email: "komala.m@leadstrategus.com",
       },
       {
-        // TODO: not on leadstrategus.com yet. Confirm role and bio; add photo ("kirubakaran-periyaswamy" → public/img/people/), LinkedIn and email.
-        name: "Kirubakaran Periyaswamy", role: "Technical Lead", photo: "",
-        bio: "Leads the technical build and infrastructure behind our engines: Clay, n8n, HubSpot and AI workflows.",
-        more: "", linkedin: "", email: "",
+        name: "Kirubakaran Periyaswamy", role: "Technical Lead", photo: "kirubakaran-periyaswamy", // TODO confirm the role title
+        bio: "Builds the agents that run the platform, from data pipelines scraping 10+ signal sources to LLMs fine-tuned for context-grounded message generation.",
+        long: [
+          "Kiruba builds the agents that run the platform, from data pipelines scraping 10+ signal sources to LLMs fine-tuned for context-grounded message generation. His work covers the full AI lifecycle: data engineering, model training, RAG pipelines, and production deployment using LangGraph, PyTorch, HuggingFace, and FastAPI. At LeadStrategus, he has automated internal workflows, built NLP pipelines, and integrated OpenAI and Anthropic Claude APIs into live systems.",
+        ],
+        linkedin: "https://www.linkedin.com/in/kirubakaranperiyasamy/", email: "kirubakaran.p@leadstrategus.com",
       },
+    ],
+  },
+
+  footer: {
+    about: "B2B go-to-market, engineered. Strategy, demand generation, intelligence, enablement and custom AI agents, from Bengaluru to wherever you sell.",
+    agentsCta: "The agents live at leadstrategus.ai",
+    sites: [
+      { name: "LeadStrategus.ai", url: "https://leadstrategus.ai/", text: "AI revenue agents for B2B pipeline automation." },
+      { name: "LeadStrategus.com", url: "https://www.leadstrategus.com/", text: "B2B GTM strategy, demand generation and AI agents." },
+      { name: "ExpoToFunnel", url: "https://expotofunnel.com/", text: "Trade shows ranked by how many of your ideal buyers attend, then meetings booked for you." },
     ],
   },
 
@@ -227,7 +254,7 @@ export default {
     { q: "Do I need to code?", a: "No. You'll work with no-code and low-code tools; we show basic expressions where useful. Comfort with spreadsheets and browser tools is enough." },
     { q: "Will my engine be production-ready after 5 days?", a: "You'll leave with a working, documented and tested engine. The 4-week implementation is where you run real sends and refine it; hardening it for full production use in your company is separate work." },
     { q: "Do you guarantee meetings or a job?", a: "No. Results depend on your offer, market, data and execution. This is not a placement programme. We teach you to build and run the system that creates meetings." },
-    { q: "Can my employer pay?", a: "Yes. We issue a GST invoice and accept payment by Razorpay link or bank transfer against a PO. Registered businesses may be able to claim GST credit — please check with your CA." },
+    { q: "Can my employer pay?", a: "Yes. We issue a GST invoice and accept payment by Razorpay link or bank transfer against a PO. Registered businesses may be able to claim GST credit; please check with your CA." },
   ],
 
   finalCta: {
