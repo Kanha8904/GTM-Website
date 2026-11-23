@@ -275,7 +275,7 @@ export function renderPage(c) {
         <div class="slider-track">${[0, 1, 2]
           .map((copy) =>
             T.map(
-              (t, i) => `<div class="slide card${copy === 1 && i === 0 ? " is-active" : ""}"${copy === 1 ? ` role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}"` : ' aria-hidden="true" data-clone'}>${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote>${t.name ? `<p class="q-name">${esc(t.name)}</p>` : ""}<p class="${t.name ? "q-role" : "q-name"}">${esc(t.role)}, ${esc(t.company)}</p></div>`
+              (t, i) => `<div class="slide card${copy === 1 && i === 0 ? " is-active" : ""}"${copy === 1 ? ` role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}"` : ' aria-hidden="true" data-clone'}>${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-by">${esc(t.role)}, ${esc(t.company)}</p></div>`
             ).join("")
           )
           .join("")}</div>

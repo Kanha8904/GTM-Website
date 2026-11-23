@@ -525,3 +525,4 @@ body.modal-open { overflow: hidden; }
 .nav a, .nav-cta { white-space: nowrap; }
 @media (min-width: 1024px) and (max-width: 1360px) { .brand-div, .brand-sub { display: none; } .nav a { padding: 8px 9px; } }
 .person[data-open] { cursor: pointer; }
+.card p.q-by { margin-top: 22px; font-size: 15px; color: var(--ink-3); }
