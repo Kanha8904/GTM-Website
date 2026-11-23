@@ -1,10 +1,10 @@
-# LeadStrategus GTM Engineering Bootcamp: landing page
+# LeadStrategus GTM Engineering Workshop: landing page
 
-A single-page, static marketing site. Everything (nav, curriculum, FAQ, application form, legal text and the thank-you state) lives on one page. Nav links scroll to sections.
+A single-page, static marketing site. Everything (programme, pricing, application form, checklist capture, FAQ, legal text and the thank-you states) lives on one page. Nav links scroll to sections.
 
 ## Edit content
 
-**All variable content lives in [`content.js`](content.js):** dates, venue, price, seats, guided-execution weeks, faculty, FAQ, client logos, form backend and analytics IDs. Lines marked `TODO` still need confirmed values.
+**All variable content lives in [`content.js`](content.js).** The `settings` block at the top holds the placeholders from the reference copy: `dates`, `seatsLeft`, `applicationsCloseDate`, `priceIndividual`, `priceTeam`, `teamDiscountPct`, `fitCallUrl`, `clutchUrl`, `checklistEndpoint`, `checklistPdfUrl`, `showClientLogos`, `showTestimonials`, `contactEmail` and `whatsapp`. Lines marked `TODO` still need confirmed values.
 
 After editing, rebuild (Netlify and Vercel do this automatically on deploy):
 
@@ -26,32 +26,37 @@ No dependencies to install. Node 18+ is enough.
 |---|---|
 | `content.js` | The one file editors change |
 | `src/render.mjs` | Turns the content into a fully prerendered `index.html` (fast, crawlable, and WhatsApp/LinkedIn link previews work) |
-| `build.mjs` | Writes `dist/`, copies `public/`, and **fails the build if banned claims appear in the copy** (guaranteed leads/meetings, PhantomBuster, etc.) |
-| `public/main.js` | Interactions: scroll-spy, mobile menu, 8-stage stepper, Day 1–5 tabs, count-up stats, modals, form validation and submission, analytics |
-| `public/styles.css` | Mobile-first styles; design tokens on `:root` |
-| `public/fonts/` | Self-hosted Plus Jakarta Sans and Inter (OFL) |
+| `build.mjs` | Writes `dist/`, copies `public/`, and **fails the build if banned claims appear in the copy** |
+| `public/main.js` | Interactions: announcement bar, scroll-spy, mobile menu, sticky Apply bar, modals, checklist capture, form validation and submission, analytics |
+| `public/styles.css` | Mobile-first styles; brand colour tokens on `:root` |
+| `public/brand/` | Logo files (shield, horizontal, stacked) as PNG + WebP, @1x/@2x |
+| `public/fonts/` | Self-hosted Montserrat, Inter and Cinzel Bold (OFL) |
 | `src/icons/` | Lucide icons (ISC), inlined at build time |
-| `scripts/make-og.mjs` | Regenerates the 1200×630 share image and favicon PNGs from `scripts/og-template.html` (needs Playwright) |
+| `scripts/make-brand.py` | Rebuilds `public/brand/`, favicons and app icons from the JPGs in `assets-src/brand/` (needs Pillow + numpy) |
+| `scripts/make-og.mjs` | Regenerates the 1200×630 share image from `scripts/og-template.html` (needs Playwright) |
 
-## Application form
+## Forms
 
-Set `form.provider` and `form.endpoint` in `content.js`:
+**Application form:** set `form.provider` and `form.endpoint` in `content.js`.
 
-- **`n8n` (recommended):** the form POSTs JSON to your n8n webhook. Suggested flow: Webhook → HubSpot create/update contact → Google Sheets append → Slack/WhatsApp/email alert. Make sure the webhook replies 2xx and allows CORS from the site's domain.
+- **`n8n` (recommended):** the form POSTs JSON to your n8n webhook. Suggested flow: Webhook → HubSpot create/update contact → Google Sheets append → Slack/WhatsApp/email alert. The webhook must reply 2xx and allow CORS from the site's domain.
 - **`formspree`** / **`web3forms`:** POSTs JSON to their endpoint (for Web3Forms put `access_key` in `form.extraFields`).
 - **`netlify`:** uses Netlify Forms. The form is already marked `data-netlify` with a honeypot.
-- **Empty (current default):** no backend yet. Submitting opens the applicant's email app with the application filled in, addressed to `contact.email`.
+- **Empty (current default):** submitting opens the applicant's email app with the application filled in, addressed to `contactEmail`.
 
-The payload includes all fields plus `utm_source`, `utm_medium`, `utm_campaign`, `page_url`, `submitted_at`, and the consent flags. `?type=cohort` (or `individual`, `sponsored`) in the URL pre-selects "I'm applying as".
+The payload includes every field plus `utm_source`, `utm_medium`, `utm_campaign`, `page_url` and `submitted_at`. `?type=team` (or `individual`, `private`) in the URL pre-selects "Coming as".
+
+**Checklist capture:** `checklistEndpoint` receives `{ email, source: "checklist", page_url, utm_*, submitted_at }`. The success state links to `checklistPdfUrl`.
 
 ## Analytics
 
-GA4, Meta Pixel and LinkedIn Insight load **only** when their IDs are set in `content.js`. A successful application fires `apply_submit`.
+GA4, Meta Pixel and LinkedIn Insight load **only** when their IDs are set in `content.js`. Events: `apply_submit`, `checklist_submit`.
 
 ## Still needed from LeadStrategus
 
-- Official logo SVG (`public/img/logo.svg` and `favicon.svg` are placeholders), then run `node scripts/make-og.mjs`
-- Kingshuk's headshot, confirmed bio and LinkedIn URL
-- Dates, venue name, contact email, WhatsApp number and live site URL
-- Approved Privacy Notice and Terms/Refund text (`legal` in `content.js`)
-- Decisions on the open questions: guided-execution length (Q1, set to 8), client logos (Q5, hidden), supporting faculty (Q8, hidden)
+- **Official SVG logo files.** The current logos are cut out of the supplied JPGs (see the TODO in `scripts/make-brand.py`)
+- Cohort dates, seats left, close date, Cohort 1 prices and team discount
+- Fit-call booking link, checklist PDF and capture endpoint
+- Faculty photos, and Kiruba's full name
+- Client quotes (with permission) before turning on `showTestimonials`, and client logo permission before `showClientLogos`
+- Approved Privacy Notice and Terms/Refund text, including the Day-1 refund promise

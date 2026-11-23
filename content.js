@@ -1,17 +1,14 @@
 /**
  * ============================================================================
- *  LeadStrategus GTM Engineering Bootcamp: SITE CONTENT & SETTINGS
+ *  LeadStrategus GTM Engineering Workshop: SITE CONTENT & SETTINGS
  * ============================================================================
- *  Edit this one file to change dates, venue, price, seats, faculty, FAQ,
- *  client logos, the form endpoint and analytics IDs. Then rebuild:
+ *  Edit this one file to change dates, seats, prices, links, faculty, FAQ,
+ *  testimonials and the form endpoints. Then rebuild:
  *
  *      node build.mjs        (Netlify / Vercel run this for you on deploy)
  *
- *  Notes for editors
- *  - Text is plain text. A few fields allow simple HTML (<strong>, <em>, <br>);
- *    those fields end in "Html".
- *  - Leave a value as "" (empty) or null to hide the thing it controls, where
- *    noted.
+ *  - Text is plain text unless the field name ends in "Html".
+ *  - "" (empty) or null hides the thing it controls, where noted.
  *  - Lines marked TODO still need a confirmed value from LeadStrategus.
  *  - CLAIMS RULE: never add copy that promises leads, meetings, revenue,
  *    pipeline, jobs/placement, vendor certification, autonomous outbound or
@@ -21,264 +18,214 @@
 
 export default {
   // ---------------------------------------------------------------------------
-  // 1. KEY FACTS (used all over the page, in the SEO tags and in JSON-LD)
+  // 1. SETTINGS: the placeholders from the reference copy live here
   // ---------------------------------------------------------------------------
-  site: {
-    url: "https://bootcamp.leadstrategus.com", // TODO: final live URL (used for OG/canonical)
-    title: "GTM Engineering Bootcamp, Bengaluru | LeadStrategus",
-    ogImage: "/img/og-image.png",
-  },
-
-  programme: {
-    name: "GTM Engineering Bootcamp",
-    tagline: "From Zero to Outbound in 5 Days",
-    city: "Bengaluru",
-    dates: "Dates TBC", // TODO (Q2): e.g. "8–12 Feb 2027"
-    startDate: "", // TODO: ISO date for search engines, e.g. "2027-02-08". Empty = left out of JSON-LD.
+  settings: {
+    dates: "Dates TBC", // TODO [DATES], e.g. "8–12 Feb 2027"
+    startDate: "", // ISO date for search engines, e.g. "2027-02-08". Empty = left out of JSON-LD.
     endDate: "", //   e.g. "2027-02-12"
-    venue: "Venue TBC", // TODO: venue name
-    venueArea: "next to ITPL, Whitefield, Bengaluru",
-    venueNote: "~7 min walk from the metro",
-    hours: "9:30 am – 5:30 pm",
-    guidedWeeks: 8, // Q1: hero copy said 4, creatives & FAQ say 8. Confirm.
-    totalSeats: 12, // Q6
-    seatsLeft: null, // e.g. 7 → shows "7 of 12 seats left". null = hidden.
-    responseDays: 3, // "We'll get back within X working days"
+    seatsLeft: null, // TODO [X] e.g. 7 → "7 OF 12 SEATS LEFT". null = that part is hidden.
+    totalSeats: 12,
+    applicationsCloseDate: "", // TODO [date] e.g. "30 Jan 2027". Empty = sentence left out.
+    priceIndividual: "₹70,000", // TODO [₹ price] confirm Cohort 1 introductory price (carried over from the earlier pricing)
+    priceTeam: "₹60,000", //       TODO [₹ price] per person for a team of 2–3 (carried over; the earlier rule was 3+ seats)
+    teamDiscountPct: 14, //        TODO [X]% saving per seat for teams
+    fitCallUrl: "", // TODO booking link for the 15-min fit call (Calendly etc.). Empty = opens an email to contactEmail.
+    clutchUrl: "https://clutch.co/profile/leadstrategus", // TODO confirm the Clutch profile URL
+    checklistEndpoint: "", // where the checklist email-capture POSTs JSON {email}. Empty = no capture, link shown straight away.
+    checklistPdfUrl: "", // TODO URL of the "8 questions" PDF. Empty = "we'll email it to you".
+    showClientLogos: false, // "Trusted by" strip: turn on only with client permission
+    showTestimonials: false, // "What our clients say": turn on once real quotes with permission exist
+    contactEmail: "info@leadstrategus.com", // TODO confirm
+    whatsapp: "", // digits incl. country code, e.g. "9198xxxxxxxx". Empty = hidden.
+    whatsappMessage: "Hi LeadStrategus, I have a question about the GTM Engineering Workshop.",
+    linkedin: "https://www.linkedin.com/company/leadstrategus/", // TODO confirm
+    city: "Bengaluru",
+    responseHours: 48,
   },
 
-  pricing: {
-    individual: { base: "₹70,000", withGst: "₹82,600" },
-    cohort: { base: "₹60,000", withGst: "₹70,800", minSeats: 3 },
-  },
-
-  contact: {
-    email: "info@leadstrategus.com", // TODO: confirm the inbox applicants should write to
-    phone: "", // TODO: e.g. "+91 98xxxxxxxx". Empty = hidden.
-    whatsapp: "", // TODO: digits only incl. country code, e.g. "9198xxxxxxxx". Empty = WhatsApp buttons hidden.
-    whatsappMessage: "Hi LeadStrategus, I have a question about the GTM Engineering Bootcamp.",
-    linkedin: "https://www.linkedin.com/company/leadstrategus/", // TODO: confirm
+  site: {
+    url: "https://workshop.leadstrategus.com", // TODO final live URL (used for canonical, OG and JSON-LD)
+    name: "GTM Engineering Workshop",
+    title: "GTM Engineering Workshop, Bengaluru | LeadStrategus",
+    description:
+      "5-day in-person GTM engineering workshop in Bengaluru + 4 weeks of guided implementation. Design, build and test your own outbound engine — ICP, signals, scoring, messaging and measurement. 12 seats.",
+    ogImage: "/img/og-image.png",
   },
 
   // ---------------------------------------------------------------------------
   // 2. APPLICATION FORM BACKEND
   // ---------------------------------------------------------------------------
   form: {
-    // "n8n"       → POST JSON to an n8n webhook (recommended)
-    // "formspree" → POST JSON to https://formspree.io/f/xxxx
-    // "web3forms" → POST JSON to https://api.web3forms.com/submit (put access_key in extraFields)
-    // "netlify"   → Netlify Forms (no endpoint needed when hosted on Netlify)
-    // ""          → no backend yet: opens the applicant's email app with the
-    //               application filled in, addressed to contact.email
+    // "n8n" | "formspree" | "web3forms" | "netlify" | "" (no backend: opens the
+    // applicant's email app with the application filled in)
     provider: "",
-    endpoint: "", // e.g. "https://n8n.yourdomain.com/webhook/bootcamp-apply"
-    extraFields: {}, // e.g. { access_key: "web3forms-public-key" }
+    endpoint: "",
+    extraFields: {},
   },
 
-  // ---------------------------------------------------------------------------
-  // 3. ANALYTICS: all OFF until an ID is filled in
-  // ---------------------------------------------------------------------------
-  analytics: {
-    ga4Id: "", // "G-XXXXXXX"
-    metaPixelId: "", // "1234567890"
-    linkedinPartnerId: "", // "1234567"
-  },
+  analytics: { ga4Id: "", metaPixelId: "", linkedinPartnerId: "" }, // all off until set
 
   // ---------------------------------------------------------------------------
-  // 4. FEATURE FLAGS
-  // ---------------------------------------------------------------------------
-  flags: {
-    showClientLogos: false, // Q5: turn on only once clients have approved logo use
-    showSupportingFaculty: false, // Q8
-  },
-
-  // ---------------------------------------------------------------------------
-  // 5. PAGE COPY
+  // 3. PAGE COPY (from the GTM Workshop look-and-feel snapshot)
   // ---------------------------------------------------------------------------
   hero: {
-    eyebrow: "GTM ENGINEERING BOOTCAMP · BENGALURU",
-    h1Before: "AI won't fill your calendar. But AI ",
-    h1Gradient: "plus judgement",
-    h1After: " will.",
-    sub: "Everyone's selling the dream: plug in a few AI tools and watch the meetings roll in. We run outbound for a living. It doesn't work like that. What works is knowing where AI does the heavy lifting, and where you must make the call. That's what this bootcamp teaches.",
+    eyebrow: "5-DAY INTENSIVE · 1-MONTH IMPLEMENTATION · BENGALURU",
+    h1Before: "Outbound, ",
+    h1Gradient: "engineered.",
+    sub: "Beyond the AI hype. Design, build and test a complete outbound prospecting engine for your own business — target logic, signals, scoring, messaging and measurement. Taught by operators who ran marketing at AWS, Gartner and SAP.",
+    buildLog: [
+      { when: "DAY 1", text: "ICP + segments chosen", gate: "gate 1" },
+      { when: "DAY 2", text: "Signal model set; accounts ranked A/B/C", gate: "gate 2" },
+      { when: "DAY 3", text: "Contacts verified; n8n workflow running" },
+      { when: "DAY 4", text: "Sequences approved", gate: "gate 3" },
+      { when: "DAY 5", text: "QA, deliverability, demo day" },
+      { when: "WK 1–4", text: "First sends · replies · refine · 90-day plan" },
+    ],
+    steps: ["Define the market", "Score on buying signals", "Launch, measure, improve"],
   },
 
-  // Q3: original line was "Your first campaign, launched with us beside you".
-  outcomes: [
-    { icon: "target", title: "Your ICP and a ranked list of accounts showing buying signals" },
-    { icon: "user-check", title: "The decision-makers to reach, and messages they'll actually reply to" },
-    { icon: "rocket", title: "Your first campaign, built and test-launched with us beside you" },
-    { icon: "workflow", title: "The full workflow (n8n + Claude agents), yours to keep" },
-  ],
+  clients: [{ name: "Client 1" }, { name: "Client 2" }, { name: "Client 3" }, { name: "Client 4" }, { name: "Client 5" }], // add logo: "/brand/clients/x.svg"
 
-  stages: [
-    {
-      n: "01", phase: 1, icon: "message-circle",
-      title: "Client discovery & business understanding",
-      objective: "Understand the business, the offering, existing customers and growth goals before touching a tool.",
-      activities: ["Discovery interviews and a structured questionnaire", "Understand the product or service and what sets it apart", "Review past customers and wins", "Identify pain points, markets and constraints"],
-      output: "Client brief, pain-point map, targeting hypothesis",
-      tools: "Claude / ChatGPT, questionnaire",
-    },
-    {
-      n: "02", phase: 1, icon: "target",
-      title: "Initial ICP & market segmentation",
-      objective: "Define the target market using clear, verifiable criteria.",
-      activities: ["Create the Ideal Customer Profile", "Segment by industry, company size and geography", "Set simple filters (revenue, headcount, technology)", "Write inclusion and exclusion rules"],
-      output: "ICP definition, segments, targeting rules",
-      tools: "Apollo, Sales Navigator",
-    },
-    {
-      n: "03", phase: 1, icon: "database",
-      title: "Macro account identification",
-      objective: "Build the first universe of companies that fit the ICP.",
-      activities: ["Search databases with your ICP filters", "Consolidate results from more than one source", "Remove duplicates and irrelevant entries", "Create the target-account universe"],
-      output: "First-cut target account universe",
-      tools: "Apollo, Sales Navigator",
-    },
-    {
-      n: "04", phase: 2, icon: "radar",
-      title: "Intelligence-led micro-segmentation",
-      objective: "Refine the list into sharper sub-segments using business context and buying signals.",
-      activities: ["Analyse business context and initiatives", "Track hiring, expansion, leadership change and projects", "Separate fact, signal, inference and hypothesis", "Shortlist the better-fit accounts"],
-      output: "Refined universe with buying signals",
-      tools: "Clay, Apollo, AI research",
-    },
-    {
-      n: "05", phase: 2, icon: "star",
-      title: "Account scoring & prioritisation",
-      objective: "Decide where to focus first, and why.",
-      activities: ["Build a simple scoring model", "Score fit and intent separately", "Tier accounts A / B / C", "Define the next best action per tier"],
-      output: "Tiered (A/B/C) account list, fit and intent scored separately",
-      tools: "Clay, scoring model",
-    },
-    {
-      n: "06", phase: 2, icon: "users",
-      title: "Contact discovery & identification",
-      objective: "Find the right people inside each priority account and make the data usable.",
-      activities: ["Map the buying committee and influencers", "Find and verify work emails", "Locate LinkedIn profiles for human-led outreach", "Clean, standardise and de-duplicate"],
-      output: "Clean, verified contact database",
-      tools: "Apollo, Clay, Sales Navigator",
-    },
-    {
-      n: "07", phase: 3, icon: "pen-line",
-      title: "Messaging architecture",
-      objective: "Create personalised, multi-step messages that start a conversation.",
-      activities: ["Message strategy by segment and persona", "Openers grounded in real, verified signals", "Follow-ups that add insight, relevance and value", "Human review before anything is sent"],
-      output: "Persona-specific message library and sequences",
-      tools: "Claude, ChatGPT, Instantly",
-    },
-    {
-      n: "08", phase: 3, icon: "send",
-      title: "Campaign launch, adapt & review",
-      objective: "Run the campaign, handle replies and learn what works.",
-      activities: ["Set up sequences and check deliverability", "Human-led LinkedIn engagement alongside email", "Track replies and log outcomes in the CRM", "Review weekly and adjust"],
-      output: "Live campaign, tracked replies, next actions",
-      tools: "Instantly, HubSpot, n8n",
-    },
-  ],
-
-  phases: {
-    1: "Understand & define the market",
-    2: "Build intelligence & database",
-    3: "Design the conversation & drive outcomes",
-  },
-
-  days: [
-    {
-      day: 1, focus: "Define the market",
-      bullets: ["ICP, exclusions and buyer roles", "A buying-signal taxonomy", "Source evidence and freshness: what counts as proof"],
-      output: "ICP + signal worksheet",
-    },
-    {
-      day: 2, focus: "Build intelligence",
-      bullets: ["Account and buyer research", "Cleaning, enrichment and verification", "Fit vs intent scoring"],
-      output: "Prioritised account table",
-    },
-    {
-      day: 3, focus: "Connect the system",
-      bullets: ["Clay tables and the HubSpot data model", "n8n basics: triggers, mapping, IF branches", "Webhooks that move data between tools"],
-      output: "A connected workflow",
-    },
-    {
-      day: 4, focus: "Prepare engagement",
-      bullets: ["Signal-based messaging", "Email sourcing, verification and deliverability (SPF / DKIM / DMARC)", "Human-led LinkedIn and call tasks"],
-      output: "Reviewed engagement plan",
-    },
-    {
-      day: 5, focus: "Test & explain",
-      bullets: ["End-to-end run, including exception paths", "CRM capture and the runbook", "Capstone demo"],
-      output: "Working MVP + runbook",
-    },
-  ],
-
-  weeks: [
-    "Adapt ICP & signals",
-    "Data quality & enrichment cost",
-    "Scoring",
-    "Workflow reliability",
-    "Messaging & deliverability",
-    "CRM & reporting",
-    "Measurement",
-    "Demo & handover",
-  ],
-
-  faculty: {
-    lead: {
-      name: "Kingshuk Hazra",
-      role: "Founder, LeadStrategus",
-      photo: "", // TODO: e.g. "/img/kingshuk.webp" (square, 320×320). Empty = initials avatar.
-      bio: "25+ years in B2B marketing, BD & GTM across AWS, SAP, Gartner and more. Kingshuk founded LeadStrategus to run outbound for B2B companies, and built this bootcamp from what the team does every week.", // TODO: confirm bio
-      linkedin: "", // TODO: LinkedIn profile URL. Empty = hidden.
-    },
-    // Shown only when flags.showSupportingFaculty is true (Q8).
-    supporting: [
-      { name: "Kiruba", role: "Technical Lead", bio: "Clay, n8n, HubSpot and AI workflows.", photo: "", linkedin: "" },
-      { name: "Komala", role: "Research & Intelligence Lead", bio: "Account research, signals and data quality.", photo: "", linkedin: "" },
+  why: {
+    h2: "Same tools. Different system.",
+    intro: "AI made outbound easier to assemble, not easier to win. When everyone uses the same models, data and prompts, outbound converges. Three things decide who books the meeting.",
+    cols: [
+      { icon: "target", title: "A sharper view of who buys, and why now.", text: "Signals that predict a purchase in your market — not just signals that are interesting." },
+      { icon: "shield-check", title: "Human judgement at three gates.", text: "AI does research, data and drafting. You decide segments, buying criteria and every message." },
+      { icon: "refresh-cw", title: "A loop that learns.", text: "Replies and meetings feed back into targeting, scoring and messaging every cycle." },
     ],
   },
 
-  stats: [
-    { value: 100, suffix: "+", label: "global outbound projects" },
-    { value: 8, suffix: "+ years", label: "in the field" },
-    { value: 25, suffix: "K+", label: "personalised messages sent" },
-    { value: 5.0, decimals: 1, prefix: "Clutch ", suffix: " ★", label: "rating (7 reviews)" },
-  ],
+  programme: {
+    eyebrow: "THE PROGRAMME · 8 STAGES · 3 GATES · 5 DAYS + 1 MONTH",
+    h2: "8 stages. 3 human gates. One engine.",
+    intro: "This isn't a course. It's a build. About 30% principles, 70% building on your own business. You leave with a working, documented engine and a plan to run it.",
+    stages: [
+      { n: "01", stage: "Client discovery", build: "Questionnaire, interviews, Claude to organise", leave: "Business brief: what you sell, who buys, why, what success looks like", control: "ai" },
+      { n: "02", stage: "ICP and segments", build: "Claude proposes 6–8 segments; you pick 2–3", leave: "ICP, buying committee, disqualifiers; 2–3 segments chosen from 6–8", control: "human" },
+      { n: "03", stage: "Signal-led account scoring", build: "Claude research agents, Apollo, n8n", leave: "Your buying-intent criteria and a ranked account list", control: "human" },
+      { n: "04", stage: "Contact discovery", build: "Apollo, Claude agents, verification", leave: "Verified decision-makers in priority accounts", control: "ai" },
+      { n: "05", stage: "Prioritisation and campaign plan", build: "Scoring model, tiers A / B / C", leave: "Tiers A / B / C, waves, channels, cadence", control: "ai" },
+      { n: "06", stage: "Messaging architecture", build: "Frameworks from our campaign data; you approve", leave: "Connect → engage → explore → convert sequences", control: "human" },
+      { n: "07", stage: "Launch", build: "Instantly, human-led LinkedIn, HubSpot", leave: "Email and human-led LinkedIn, tracked in your CRM", control: "ai" },
+      { n: "08", stage: "Review and improve", build: "HubSpot, n8n logs, weekly review", leave: "Weekly review; results feed targeting and messages", control: "ai" },
+    ],
+    note: "Prefer full automation? You can switch the gates off. We'll show you what that costs in quality.",
+  },
 
-  // Shown only when flags.showClientLogos is true (Q5). Add `logo: "/img/clients/kotak.svg"` once you have files.
-  clients: [
-    { name: "Kotak" }, { name: "OPPO" }, { name: "Razorpay" }, { name: "EY" }, { name: "Alibaba Cloud" },
-  ],
+  days: {
+    h2: "5 days to build. 1 month to implement.",
+    summary: [
+      { tag: "IN PERSON · BENGALURU", big: "5", unit: "days", text: "Principles in the morning. Building on your own business in the afternoon. Demo day on Friday." },
+      { tag: "ONLINE · 2 × 1 HR A WEEK", big: "4", unit: "weeks", text: "First sends, replies, refinement and a 90-day plan — with our team reviewing your engine." },
+    ],
+    subhead: "The 5 days. Something built every day.",
+    list: [
+      { label: "DAY 1 · STAGES 1–2", title: "Foundations and discovery", text: "Brief, ICP, chosen segments, signal thesis, success metrics" },
+      { label: "DAY 2 · STAGE 3", title: "Signals and account scoring", text: "Your scoring model and a ranked account list" },
+      { label: "DAY 3 · STAGES 4–5", title: "Contacts and orchestration", text: "Contact database, tiers, campaign plan, n8n workflow running" },
+      { label: "DAY 4 · STAGE 6", title: "Messaging and AI agents", text: "Approved message library; Clay and Claude Code demo" },
+      { label: "DAY 5 · STAGES 7–8", title: "Launch readiness and demo day", text: "Deliverability, QA, dashboard, live demo to the cohort" },
+    ],
+  },
+
+  month: {
+    h2: "The month after. Real sends, reviewed.",
+    sub: "Two live 1-hour sessions a week, online. Private review slots if your data can't be shared.",
+    weeks: ["Scope and data review", "First sends and deliverability", "Replies, results, refine", "Final demo and 90-day plan"],
+  },
+
+  stack: {
+    h2: "A lean stack. Chosen by job.",
+    cols: [
+      { label: "REASONING", tools: "Claude · ChatGPT" },
+      { label: "DATA", tools: "Apollo.io" },
+      { label: "ORCHESTRATION", tools: "n8n" },
+      { label: "SENDING", tools: "Instantly" },
+      { label: "SYSTEM OF RECORD", tools: "HubSpot" },
+    ],
+    demoOnly: "Clay · Claude Code",
+  },
+
+  who: {
+    h2: "For serious practitioners who own pipeline.",
+    cards: [
+      { icon: "rocket", title: "Founders selling B2B", text: "Need a repeatable way to create first meetings." },
+      { icon: "briefcase", title: "Sales, demand-gen and RevOps leads", text: "Building or fixing an outbound motion." },
+      { icon: "user-round", title: "First GTM hires", text: "Know the tools; want the judgement behind them." },
+      { icon: "users", title: "Teams of 2–3", text: "Best results. Save {teamDiscountPct}% per seat.", link: "#pricing" },
+    ],
+    note: "Not a tool certification. Not a placement programme.",
+  },
+
+  proof: {
+    badge: "5-STAR RATED ON CLUTCH",
+    h2: "What our clients say.",
+    testimonials: [
+      // TODO: real quotes, used with permission
+      { quote: "[Client quote with permission]", role: "[Role]", company: "[Company type, country]" },
+      { quote: "[Client quote with permission]", role: "[Role]", company: "[Company type, country]" },
+      { quote: "[Client quote with permission]", role: "[Role]", company: "[Company type, country]" },
+    ],
+  },
+
+  faculty: {
+    h2: "An operating firm that trains.",
+    sub: "Everything we teach, we run for clients every week.",
+    people: [
+      { name: "Kingshuk Hazra", focus: "Strategy, segmentation, messaging", photo: "", linkedin: "" }, // TODO photo "/brand/people/kingshuk.webp"
+      { name: "Komala Maran", focus: "Workflows and the judgement layer", photo: "", linkedin: "" },
+      { name: "Kiruba", focus: "Technical build and infrastructure", photo: "", linkedin: "" }, // TODO [Kiruba] confirm full name
+    ],
+  },
+
+  checklist: {
+    tag: "FREE · PDF",
+    title: "8 questions to answer before you deploy an outbound engine.",
+    cta: "Get the checklist →",
+  },
+
+  pricing: {
+    h2: "12 seats. Introductory pricing.",
+    sub: "First cohort only. Price rises after Cohort 1.",
+  },
+
+  apply: {
+    h2: "Tell us what you sell. We'll call within 48 hours.",
+    sub: "Two minutes. We check fit before anyone pays.",
+    trust: ["NO PAYMENT TO APPLY", "GST INVOICE", "DAY-1 REFUND PROMISE"],
+    roles: ["Founder", "Sales or demand-gen lead", "RevOps", "First GTM hire", "Other"],
+    success: "Application received. We'll call you within 48 hours to check fit.",
+  },
 
   faq: [
-    { q: "What is GTM engineering?", a: "Designing and connecting the data, research, AI, outreach, CRM and workflow pieces that make B2B prospecting systematic. It's not just learning tools." },
-    { q: "Do I need to know how to code?", a: "No. Basic expressions are shown. Advanced coding is optional stretch material." },
-    { q: "Can a fresher join?", a: "It's not a beginner placement course. You should have basic B2B prospecting familiarity. Admission is selective." },
-    { q: "Do I need to buy Clay, n8n or HubSpot?", a: "No. We provide controlled classroom workspaces for the programme period." },
-    { q: "Will we send emails to real prospects in class?", a: "No. Class exercises use real public companies with fictional contacts and test inboxes. No mass blasting. Running real campaigns is part of what you prepare for during guided execution, under your own company's approvals." },
-    { q: "Is LinkedIn automation taught?", a: "No. LinkedIn research and engagement are human-led. No scraping or automated messaging." },
-    { q: "Is this a placement programme? Does it guarantee meetings?", a: "No. Results depend on your offer, market, data and execution. We teach you to build and run the system." },
-    { q: "What certificate do I get?", a: "A practitioner certificate after you pass the capstone (70/100 plus mandatory gates). It's a LeadStrategus certificate, not an accredited or vendor certification." },
-    { q: "What happens after the 5 days?", a: "{N} weeks of weekly live sessions, a private cohort community, recordings and templates. This is group support, not 1:1 consulting." },
-    { q: "Can my company claim GST credit?", a: "Registered businesses may be eligible. Please confirm with your CA." },
-    { q: "What's the refund / transfer policy?", a: "Written cancellation, refund and substitution terms are shared before payment." },
-    { q: "Where exactly is the venue?", a: "Next to ITPL, Whitefield, ~7 min from the metro. The exact address is in your joining note." },
+    { q: "How is this different from a Clay or n8n course?", a: "Those teach a tool. We teach you to design a system and choose tools by job, with frameworks from our own client campaigns." },
+    { q: "Do I need to code?", a: "No. You'll work with no-code and low-code tools; we show basic expressions where useful. Comfort with spreadsheets and browser tools is enough." },
+    { q: "Will my engine be production-ready after 5 days?", a: "You'll leave with a working, documented and tested engine. The 4-week implementation is where you run real sends and refine it; hardening it for full production use in your company is separate work." },
+    { q: "Do you guarantee meetings or a job?", a: "No. Results depend on your offer, market, data and execution. This is not a placement programme. We teach you to build and run the system that creates meetings." },
+    { q: "Can my employer pay?", a: "Yes. We issue a GST invoice and accept payment by Razorpay link or bank transfer against a PO. Registered businesses may be able to claim GST credit — please check with your CA." },
   ],
 
+  finalCta: {
+    h2: "12 seats. One engine that's yours.",
+    sub: "We read every one and call you within 48 hours to check fit.",
+  },
+
   // ---------------------------------------------------------------------------
-  // 6. LEGAL (placeholder text: replace with the approved versions)
+  // 4. LEGAL (placeholder text: replace with the approved versions)
   // ---------------------------------------------------------------------------
   legal: {
     privacyHtml: `
       <p><strong>Placeholder. Replace with the approved LeadStrategus Privacy Notice before launch.</strong></p>
-      <p>When you apply, we collect the details you enter in the form (name, work email, phone, company, role, LinkedIn URL, experience, goals and how you heard about us), plus the campaign tags in the page link (UTM parameters).</p>
-      <p>We use these details only to review your application and to contact you about this programme. If you separately opt in, we may also send you updates about future LeadStrategus programmes. You can opt out at any time.</p>
-      <p>Your data is stored in our CRM and internal tools with access limited to the programme team. We do not sell your data.</p>
-      <p>To access, correct or delete your data, write to the contact email on this page.</p>`,
+      <p>When you apply, we collect the details you enter in the form (name, work email, company and website, role, what you sell, how you're coming) plus the campaign tags in the page link (UTM parameters). If you request the checklist, we collect your email address.</p>
+      <p>We use these details only to review your application, contact you about this workshop and send you what you asked for. We do not sell your data.</p>
+      <p>Your data is stored in our CRM and internal tools with access limited to the programme team. To access, correct or delete it, write to the contact email on this page.</p>`,
     termsHtml: `
       <p><strong>Placeholder. Replace with the approved Terms, Cancellation, Refund and Substitution policy before launch.</strong></p>
-      <p>Admission is selective. A seat is confirmed only after written confirmation from LeadStrategus and receipt of payment (Razorpay link, or bank transfer against a purchase order). A GST invoice is provided.</p>
-      <p>Written cancellation, refund, transfer and substitution terms are shared with you before payment.</p>
-      <p>The programme builds practical capability. It does not guarantee leads, meetings, pipeline, revenue, jobs or placement, and the certificate is a LeadStrategus practitioner certificate, not an accredited or vendor certification.</p>
-      <p>Travel, accommodation and lunch are not included.</p>`,
+      <p>There is no payment to apply. A seat is confirmed after a fit call, written confirmation from LeadStrategus and receipt of payment (Razorpay link, or bank transfer against a purchase order). A GST invoice is provided.</p>
+      <p>Day-1 refund promise: TODO, insert the exact terms.</p>
+      <p>The workshop builds practical capability. It does not guarantee leads, meetings, pipeline, revenue, jobs or placement, and it is not a tool or vendor certification.</p>
+      <p>Travel and accommodation are not included.</p>`,
   },
 };

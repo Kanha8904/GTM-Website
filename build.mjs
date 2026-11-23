@@ -22,8 +22,9 @@ const html = renderPage(content).replaceAll("__BUILD__", Date.now().toString(36)
 // Claims guard (§1.3): fail the build if risky phrasing slips into the copy.
 const text = html.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]+>/g, " ");
 for (const re of banned) for (const m of text.matchAll(new RegExp(re.source, re.flags + "g"))) {
-  // Questions ("Does it guarantee meetings?") and disclaimers ("not a guarantee of meetings") are allowed.
-  if (/^\s*\?/.test(text.slice(m.index + m[0].length, m.index + m[0].length + 3))) continue;
+  // Questions ("Do you guarantee meetings or a job?") and disclaimers ("not a guarantee of meetings") are allowed.
+  const end = text.slice(m.index).search(/[.?!]/);
+  if (end >= 0 && text[m.index + end] === "?") continue;
   if (!/\b(not|no|doesn't|does not|never|expect|want)\b[^.]{0,40}$/i.test(text.slice(Math.max(0, m.index - 60), m.index))) {
     console.error(`✖ Claims guard: "${m[0]}" appears in the copy. See §1.3 of the brief.`);
     process.exit(1);

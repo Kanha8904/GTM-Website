@@ -1,10 +1,15 @@
-/* LeadStrategus GTM Engineering Bootcamp: page interactions (no dependencies) */
+/* LeadStrategus GTM Engineering Workshop: page interactions (no dependencies) */
 (() => {
   "use strict";
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const cfg = JSON.parse($("#site-config").textContent);
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const escHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const store = {
+    get: (k) => { try { return sessionStorage.getItem(k); } catch (_) { return null; } },
+    set: (k, v) => { try { sessionStorage.setItem(k, v); } catch (_) {} },
+  };
 
   /* ---------- analytics (off unless IDs are set in content.js) ---------- */
   const A = cfg.analytics || {};
@@ -32,15 +37,32 @@
   const track = (name, params = {}) => {
     try {
       if (window.gtag) window.gtag("event", name, params);
-      if (window.fbq) window.fbq("track", "SubmitApplication", params);
+      if (window.fbq) window.fbq("trackCustom", name, params);
       if (window.lintrk) window.lintrk("track", params);
       window.dataLayer && window.dataLayer.push({ event: name, ...params });
     } catch (_) { /* never break the page for analytics */ }
   };
 
-  /* ---------- header: shrink, mobile menu, scroll-spy ---------- */
+  /* ---------- UTM capture (shared by both forms) ---------- */
+  const qs = new URLSearchParams(location.search);
+  const utm = {};
+  ["utm_source", "utm_medium", "utm_campaign"].forEach((k) => {
+    let v = qs.get(k);
+    if (v) store.set(k, v); else v = store.get(k);
+    if (v) utm[k] = v.slice(0, 200);
+  });
+
+  /* ---------- announcement bar ---------- */
+  const annX = $("#ann-x");
+  if (annX) annX.addEventListener("click", () => {
+    document.documentElement.classList.add("ann-off");
+    store.set("ann-dismissed", "1");
+    $(".brand").focus();
+  });
+
+  /* ---------- header: shadow on scroll, mobile menu, scroll-spy ---------- */
   const header = $("#site-header");
-  const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 24);
+  const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 40);
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -70,7 +92,7 @@
     navLinks.forEach((_, id) => { const s = document.getElementById(id); if (s) spy.observe(s); });
   }
 
-  /* ---------- sticky mobile Apply bar: hidden while #apply (or footer) is visible ---------- */
+  /* ---------- sticky mobile Apply bar: hidden while another Apply button is on screen ---------- */
   const bar = $("#mobile-bar");
   if (bar && "IntersectionObserver" in window) {
     const hideFor = new Set();
@@ -78,92 +100,7 @@
       entries.forEach((e) => (e.isIntersecting ? hideFor.add(e.target) : hideFor.delete(e.target)));
       bar.classList.toggle("hide", hideFor.size > 0);
     }, { threshold: 0.05 });
-    [$("#apply"), $(".site-footer"), $(".hero .cta-row")].forEach((el) => el && io.observe(el));
-  }
-
-  /* ---------- reveal on scroll ---------- */
-  const reveals = $$(".reveal");
-  if (!reduceMotion && "IntersectionObserver" in window) {
-    const ro = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); } });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
-    reveals.forEach((el) => ro.observe(el));
-  } else reveals.forEach((el) => el.classList.add("in"));
-
-  /* ---------- 8-stage stepper (single-open disclosure) ---------- */
-  const stageBtns = $$(".stage-btn");
-  const openStage = (btn, focus) => {
-    stageBtns.forEach((b) => {
-      const on = b === btn;
-      b.setAttribute("aria-expanded", String(on));
-      document.getElementById(b.getAttribute("aria-controls")).hidden = !on;
-    });
-    if (focus) btn.focus();
-  };
-  stageBtns.forEach((btn, i) => {
-    btn.addEventListener("click", () => {
-      const isOpen = btn.getAttribute("aria-expanded") === "true";
-      const desktop = window.matchMedia("(min-width: 1024px)").matches;
-      if (isOpen && !desktop) { // on mobile, tapping an open stage closes it
-        btn.setAttribute("aria-expanded", "false");
-        document.getElementById(btn.getAttribute("aria-controls")).hidden = true;
-        return;
-      }
-      openStage(btn);
-      if (!desktop) {
-        const top = btn.getBoundingClientRect().top;
-        if (top < 70) btn.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
-      }
-    });
-    btn.addEventListener("keydown", (e) => {
-      const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
-      if (e.key in keys) { e.preventDefault(); stageBtns[(i + keys[e.key] + stageBtns.length) % stageBtns.length].focus(); }
-      if (e.key === "Home") { e.preventDefault(); stageBtns[0].focus(); }
-      if (e.key === "End") { e.preventDefault(); stageBtns[stageBtns.length - 1].focus(); }
-    });
-  });
-
-  /* ---------- Day 1–5 tabs (ARIA tablist, automatic activation) ---------- */
-  const tabs = $$('.day-tabs [role="tab"]');
-  const selectTab = (tab, focus = true) => {
-    tabs.forEach((t) => {
-      const on = t === tab;
-      t.setAttribute("aria-selected", String(on));
-      t.tabIndex = on ? 0 : -1;
-      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
-    });
-    if (focus) tab.focus();
-    tab.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
-  };
-  tabs.forEach((tab, i) => {
-    tab.addEventListener("click", () => selectTab(tab, false));
-    tab.addEventListener("keydown", (e) => {
-      let n = null;
-      if (e.key === "ArrowRight") n = (i + 1) % tabs.length;
-      if (e.key === "ArrowLeft") n = (i - 1 + tabs.length) % tabs.length;
-      if (e.key === "Home") n = 0;
-      if (e.key === "End") n = tabs.length - 1;
-      if (n !== null) { e.preventDefault(); selectTab(tabs[n]); }
-    });
-  });
-
-  /* ---------- count-up stats ---------- */
-  const statsEl = $("#stats");
-  if (statsEl && !reduceMotion && "IntersectionObserver" in window) {
-    const nums = $$(".stat-val", statsEl).map((el) => ({ el: $(".num", el), to: parseFloat(el.dataset.count), d: +el.dataset.decimals || 0 }));
-    nums.forEach((n) => (n.el.textContent = (0).toFixed(n.d)));
-    const so = new IntersectionObserver((entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return;
-      so.disconnect();
-      const t0 = performance.now(), dur = 1400;
-      const step = (t) => {
-        const k = Math.min(1, (t - t0) / dur), ease = 1 - Math.pow(1 - k, 3);
-        nums.forEach((n) => (n.el.textContent = (n.to * ease).toFixed(n.d)));
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    }, { threshold: 0.4 });
-    so.observe(statsEl);
+    [$("#apply"), $("#join"), $(".site-footer"), $(".hero .cta-row")].forEach((el) => el && io.observe(el));
   }
 
   /* ---------- modals (native <dialog>: focus-trapped, Esc closes) ---------- */
@@ -178,105 +115,120 @@
   }));
   $$("dialog.modal").forEach((d) => {
     d.addEventListener("close", () => { document.body.classList.remove("modal-open"); lastFocus && lastFocus.focus(); });
-    d.addEventListener("click", (e) => { if (e.target === d) d.close(); }); // backdrop click
+    d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
     $$("[data-close]", d).forEach((b) => b.addEventListener("click", () => d.close()));
   });
 
-  /* ---------- Application form ---------- */
+  /* ---------- shared POST helper ---------- */
+  const postJSON = async (url, payload) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload), signal: ctrl.signal });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+    } finally { clearTimeout(timer); }
+  };
+  const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+
+  /* ---------- lead magnet: checklist email capture ---------- */
+  const clOpen = $("#cl-open"), clForm = $("#cl-form"), clDone = $("#cl-done");
+  if (clOpen && clForm) {
+    const clEmail = $("#cl-email"), clErr = $("#cl-err");
+    const finish = () => {
+      clForm.hidden = true;
+      clOpen.hidden = true;
+      clDone.hidden = false;
+      clDone.innerHTML = cfg.checklistPdfUrl
+        ? `Thanks. <a href="${escHtml(cfg.checklistPdfUrl)}" target="_blank" rel="noopener">Download the checklist (PDF)</a>`
+        : "Thanks. We'll email the checklist to you shortly.";
+      track("checklist_submit");
+    };
+    clOpen.addEventListener("click", () => {
+      if (!cfg.checklistEndpoint && cfg.checklistPdfUrl) { finish(); return; } // nothing to capture: give the PDF
+      clForm.hidden = false;
+      clOpen.setAttribute("aria-expanded", "true");
+      clOpen.hidden = true;
+      clEmail.focus();
+    });
+    clForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!emailOk(clEmail.value)) { clErr.textContent = "Please enter a valid work email."; clEmail.setAttribute("aria-invalid", "true"); clEmail.focus(); return; }
+      clErr.textContent = ""; clEmail.setAttribute("aria-invalid", "false");
+      const btn = $("button[type=submit]", clForm); btn.disabled = true;
+      try {
+        if (cfg.checklistEndpoint) await postJSON(cfg.checklistEndpoint, { email: clEmail.value.trim(), source: "checklist", page_url: location.href.split("#")[0], ...utm, submitted_at: new Date().toISOString() });
+        finish();
+      } catch (_) {
+        clErr.innerHTML = `Couldn't send that. Please try again, or email <a href="mailto:${escHtml(cfg.email)}">${escHtml(cfg.email)}</a>.`;
+      } finally { btn.disabled = false; }
+    });
+  }
+
+  /* ---------- application form ---------- */
   const form = $("#apply-form");
   if (!form) return;
   const status = $("#form-status");
   const submitBtn = $("#submit-btn");
-  const seatsField = $("#seats-field");
-  const seatsInput = $("#f-seats");
-  const goal = $("#f-goal");
-  const counter = $("#goal-count");
+  const sell = $("#f-sell");
+  const counter = $("#sell-count");
 
-  // UTM + page URL hidden fields
-  const qs = new URLSearchParams(location.search);
-  ["utm_source", "utm_medium", "utm_campaign"].forEach((k) => {
-    let v = qs.get(k);
-    try { if (v) sessionStorage.setItem(k, v); else v = sessionStorage.getItem(k); } catch (_) {}
-    if (v) form.elements[k].value = v.slice(0, 200);
-  });
+  Object.entries(utm).forEach(([k, v]) => (form.elements[k].value = v));
   form.elements.page_url.value = location.href.split("#")[0];
 
-  // Applicant type ↔ seats field
-  const typeMap = { individual: "individual", sponsored: "company_sponsored", company_sponsored: "company_sponsored", cohort: "cohort" };
-  const syncSeats = () => {
-    const cohort = form.elements.applicant_type.value === "cohort";
-    seatsField.hidden = !cohort;
-    seatsInput.required = cohort;
-  };
+  // "Coming as": pre-selected from the pricing cards or ?type=
+  const typeMap = { individual: "individual", team: "team", cohort: "team", private: "private" };
   const setType = (t) => {
     const v = typeMap[t];
     if (!v) return;
-    const r = form.querySelector(`input[name="applicant_type"][value="${v}"]`);
-    if (r) { r.checked = true; syncSeats(); }
+    if (v === "private") $(".seg-private").hidden = false;
+    const r = form.querySelector(`input[name="coming_as"][value="${v}"]`);
+    if (r) r.checked = true;
   };
-  $$('input[name="applicant_type"]').forEach((r) => r.addEventListener("change", () => { syncSeats(); validateField("applicant_type"); }));
   if (qs.get("type")) setType(qs.get("type").toLowerCase());
   $$("[data-apply-type]").forEach((a) => a.addEventListener("click", () => setType(a.dataset.applyType)));
 
-  // Character counter
-  const updateCount = () => (counter.textContent = `${goal.value.length} / 500`);
-  goal.addEventListener("input", updateCount);
+  const updateCount = () => (counter.textContent = `${sell.value.length} / 600`);
+  sell.addEventListener("input", updateCount);
   updateCount();
 
-  // Validation
   const rules = {
     full_name: { el: "#f-name", err: "#e-name", test: (v) => v.trim().length >= 2, msg: "Please enter your full name." },
-    work_email: { el: "#f-email", err: "#e-email", test: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()), msg: "Please enter a valid work email." },
-    phone: { el: "#f-phone", err: "#e-phone", test: (v) => v.replace(/\D/g, "").length >= 10 && /^[+\d\s()-]+$/.test(v.trim()), msg: "Please enter a valid phone / WhatsApp number, e.g. +91 98765 43210." },
-    company: { el: "#f-company", err: "#e-company", test: (v) => v.trim().length >= 2, msg: "Please enter your company." },
-    role: { el: "#f-role", err: "#e-role", test: (v) => v.trim().length >= 2, msg: "Please enter your role or title." },
-    linkedin_url: { el: "#f-li", err: "#e-li", test: (v) => /^(https?:\/\/)?([a-z]{2,3}\.)?linkedin\.com\/.+/i.test(v.trim()), msg: "Please paste your LinkedIn profile URL (linkedin.com/in/…)." },
-    experience: { el: "#f-exp", err: "#e-exp", test: (v) => !!v, msg: "Please choose your outbound experience." },
-    goals: { el: "#f-goal", err: "#e-goal", test: (v) => v.trim().length >= 10 && v.length <= 500, msg: "Please tell us a little more (10–500 characters)." },
+    work_email: { el: "#f-email", err: "#e-email", test: emailOk, msg: "Please enter a valid work email." },
+    company: { el: "#f-company", err: "#e-company", test: (v) => v.trim().length >= 2, msg: "Please enter your company and website." },
+    what_you_sell: { el: "#f-sell", err: "#e-sell", test: (v) => v.trim().length >= 10 && v.length <= 600, msg: "Tell us a little more: what you sell, and to whom (10–600 characters)." },
   };
-  const special = {
-    applicant_type: { err: "#e-type", test: () => !!form.elements.applicant_type.value, msg: "Please choose how you're applying.", focus: () => form.querySelector('input[name="applicant_type"]') },
-    seats: { err: "#e-seats", test: () => seatsField.hidden || (+seatsInput.value >= cfg.minSeats && Number.isInteger(+seatsInput.value)), msg: `Cohort pricing needs at least ${cfg.minSeats} seats from the same employer.`, focus: () => seatsInput },
-    consent: { err: "#e-consent", test: () => form.elements.consent.checked, msg: "Please agree so we can contact you about your application.", focus: () => form.elements.consent },
-    scope_ack: { err: "#e-scope", test: () => form.elements.scope_ack.checked, msg: "Please confirm you've read this.", focus: () => form.elements.scope_ack },
+  const checks = {
+    can_attend: { err: "#e-attend", msg: "The workshop is in person, so we need you there all 5 days." },
+    consent: { err: "#e-consent", msg: "Please agree so we can contact you about your application." },
   };
-  const setErr = (errSel, inputs, msg) => {
-    $(errSel).textContent = msg || "";
-    inputs.forEach((i) => i && i.setAttribute("aria-invalid", msg ? "true" : "false"));
-  };
+  const setErr = (errSel, el, msg) => { $(errSel).textContent = msg || ""; el.setAttribute("aria-invalid", msg ? "true" : "false"); };
   function validateField(name) {
     if (rules[name]) {
       const r = rules[name], el = $(r.el), ok = r.test(el.value);
-      setErr(r.err, [el], ok ? "" : r.msg);
+      setErr(r.err, el, ok ? "" : r.msg);
       return ok ? null : el;
     }
-    const s = special[name];
-    const ok = s.test();
-    const inputs = name === "applicant_type" ? $$('input[name="applicant_type"]') : [s.focus()];
-    setErr(s.err, inputs, ok ? "" : s.msg);
-    return ok ? null : s.focus();
+    const el = form.elements[name], ok = el.checked;
+    setErr(checks[name].err, el, ok ? "" : checks[name].msg);
+    return ok ? null : el;
   }
   Object.keys(rules).forEach((n) => {
     const el = $(rules[n].el);
     el.addEventListener("blur", () => { if (el.value || el.getAttribute("aria-invalid") === "true") validateField(n); });
     el.addEventListener("input", () => { if (el.getAttribute("aria-invalid") === "true") validateField(n); });
   });
-  ["consent", "scope_ack"].forEach((n) => form.elements[n].addEventListener("change", () => validateField(n)));
-  seatsInput.addEventListener("input", () => validateField("seats"));
+  Object.keys(checks).forEach((n) => form.elements[n].addEventListener("change", () => validateField(n)));
 
   const showStatus = (html) => { status.innerHTML = html; status.hidden = !html; };
-  const escHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
   const collect = () => {
     const fd = new FormData(form);
     const data = {};
-    fd.forEach((v, k) => { if (k !== "company_website" && k !== "form-name") data[k] = typeof v === "string" ? v.trim() : v; });
-    if (seatsField.hidden) delete data.seats;
+    fd.forEach((v, k) => { if (k !== "company_url_confirm" && k !== "form-name") data[k] = typeof v === "string" ? v.trim() : v; });
+    data.can_attend = !!form.elements.can_attend.checked;
     data.consent = !!form.elements.consent.checked;
-    data.scope_ack = !!form.elements.scope_ack.checked;
-    data.marketing_optin = !!form.elements.marketing_optin.checked;
     data.submitted_at = new Date().toISOString();
-    data.source = "gtm-bootcamp-landing";
+    data.source = "gtm-workshop-landing";
     return data;
   };
 
@@ -284,44 +236,30 @@
     const f = cfg.form || {};
     const provider = (f.provider || "").toLowerCase();
     if (provider === "netlify") {
-      const body = new URLSearchParams({ "form-name": "bootcamp-apply", ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) });
+      const body = new URLSearchParams({ "form-name": "workshop-apply", ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) });
       const res = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body });
       if (!res.ok) throw new Error("HTTP " + res.status);
       return;
     }
     if (provider && f.endpoint) {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 20000);
       const payload = { ...(f.extraFields || {}), ...data };
-      if (provider === "web3forms") payload.subject = payload.subject || "New GTM Bootcamp application";
-      const res = await fetch(f.endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
-        signal: ctrl.signal,
-      });
-      clearTimeout(timer);
-      if (!res.ok) throw new Error("HTTP " + res.status);
+      if (provider === "web3forms") payload.subject = payload.subject || "New GTM Workshop application";
+      await postJSON(f.endpoint, payload);
       return;
     }
     // No backend configured yet: hand the application to the applicant's email app.
     const lines = Object.entries(data).map(([k, v]) => `${k.replace(/_/g, " ")}: ${v}`).join("\n");
-    location.href = `mailto:${cfg.email}?subject=${encodeURIComponent("GTM Bootcamp application: " + data.full_name)}&body=${encodeURIComponent(lines)}`;
+    location.href = `mailto:${cfg.email}?subject=${encodeURIComponent("GTM Workshop application: " + data.full_name)}&body=${encodeURIComponent(lines)}`;
   };
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     showStatus("");
-    if (form.elements.company_website.value) return; // honeypot: silently drop bots
+    if (form.elements.company_url_confirm.value) return; // honeypot: silently drop bots
 
-    const order = ["full_name", "work_email", "phone", "company", "role", "linkedin_url", "applicant_type", "seats", "experience", "goals", "consent", "scope_ack"];
     let firstBad = null;
-    order.forEach((n) => { const bad = validateField(n); if (bad && !firstBad) firstBad = bad; });
-    if (firstBad) {
-      showStatus("Please fix the highlighted fields and try again.");
-      firstBad.focus();
-      return;
-    }
+    ["full_name", "work_email", "company", "what_you_sell", "can_attend", "consent"].forEach((n) => { const bad = validateField(n); if (bad && !firstBad) firstBad = bad; });
+    if (firstBad) { showStatus("Please fix the highlighted fields and try again."); firstBad.focus(); return; }
 
     submitBtn.disabled = true;
     submitBtn.setAttribute("aria-busy", "true");
@@ -330,15 +268,15 @@
     try {
       const data = collect();
       await send(data);
-      track("apply_submit", { applicant_type: data.applicant_type, seats: data.seats || 1 });
+      track("apply_submit", { coming_as: data.coming_as, role: data.role });
       form.hidden = true;
       const thanks = $("#thanks");
       thanks.hidden = false;
       thanks.focus();
       thanks.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
     } catch (err) {
-      showStatus(`Sorry, something went wrong sending your application. Please try again, or <a href="mailto:${escHtml(cfg.email)}">email us at ${escHtml(cfg.email)}</a>${cfg.whatsapp ? ` or <a href="${escHtml(cfg.whatsapp)}" target="_blank" rel="noopener">message us on WhatsApp</a>` : ""}.`);
-      status.focus && status.setAttribute("tabindex", "-1");
+      showStatus(`Sorry, your application didn't go through. Please try again, or <a href="mailto:${escHtml(cfg.email)}">email us at ${escHtml(cfg.email)}</a>${cfg.whatsapp ? ` or <a href="${escHtml(cfg.whatsapp)}" target="_blank" rel="noopener">message us on WhatsApp</a>` : ""}.`);
+      status.setAttribute("tabindex", "-1");
       status.focus();
     } finally {
       submitBtn.disabled = false;
