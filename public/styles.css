@@ -189,16 +189,8 @@ button { font: inherit; color: inherit; }
   .buildlog li { animation: row-in .5s ease both; animation-delay: calc(var(--i) * .16s + .3s); }
   @keyframes row-in { from { opacity: 0; transform: translateX(-8px); } }
 }
-.steps-strip { margin-top: 48px; display: grid; gap: 0; border-top: 1px solid var(--line-input); }
-.steps-strip li { display: flex; gap: 12px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); font: 700 13px/1.4 var(--f-head); letter-spacing: .1em; text-transform: uppercase; color: var(--navy); }
-.ss-n { color: var(--red-text); }
-@media (min-width: 760px) {
-  .steps-strip { grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line-input); }
-  .steps-strip li { border-bottom: 0; padding: 20px 0; }
-  .steps-strip li + li { padding-left: 24px; border-left: 1px solid var(--line); }
-}
 @media (min-width: 1000px) {
-  .hero { padding: 80px 0 56px; }
+  .hero { padding: 80px 0 72px; }
   .hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(460px, .85fr); gap: clamp(48px, 6vw, 120px); }
   .hero-visual { padding: 108px 0; }
   .f-sphere { width: 96px; top: 0; right: 0; }
@@ -479,12 +471,6 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .faq-ic { transition: transform .2s; color: var(--blue); }
 .faq-item[open] .faq-ic { transform: rotate(45deg); }
 .faq-a { padding: 0 20px 20px; }
-
-/* final CTA */
-.final-card { text-align: center; padding: 48px 24px; border-radius: var(--r); background: linear-gradient(120deg, var(--red-tint), var(--card) 45%, var(--blue-tint)); border: 1px solid var(--line); }
-.final h2::after { content: ""; display: block; width: 56px; height: 4px; border-radius: 4px; background: var(--red); margin: 18px auto 0; }
-.final .sec-sub { margin-left: auto; margin-right: auto; }
-.final .cta-row { justify-content: center; }
 
 /* footer */
 .site-footer { padding: 64px 0 112px; background: var(--silver); color: var(--ink-2); border-top: 1px solid #D5DBE5; }

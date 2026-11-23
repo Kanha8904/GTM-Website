@@ -77,12 +77,8 @@ export function renderPage(c) {
   const seats = S.totalSeats;
   const fill = (s) => String(s).replaceAll("{teamDiscountPct}", S.teamDiscountPct);
   const wa = S.whatsapp ? `https://wa.me/${encodeURIComponent(S.whatsapp)}?text=${encodeURIComponent(S.whatsappMessage)}` : "";
-  const fitCall = S.fitCallUrl || `mailto:${S.contactEmail}?subject=${encodeURIComponent("15-min fit call: GTM Engineering Workshop")}`;
-  const ext = (url) => (/^https?:/.test(url) ? ' target="_blank" rel="noopener"' : "");
   const applyBtn = (label = "Apply for Cohort 1", extra = "", type = "") =>
     `<a class="btn btn-primary ${extra}" href="#apply"${type ? ` data-apply-type="${type}"` : ""}>${label} ${icon("arrow-right")}</a>`;
-  const fitBtn = (label = "Book a 15-min fit call", extra = "") =>
-    `<a class="btn btn-ghost ${extra}" href="${esc(fitCall)}"${ext(fitCall)}>${icon("asterisk")} ${label}</a>`;
 
   const ogUrl = c.site.url.replace(/\/$/, "");
   const ogImg = ogUrl + c.site.ogImage;
@@ -157,7 +153,7 @@ export function renderPage(c) {
     <div class="hero-copy">
       <h1>${esc(c.hero.h1Before)}<span class="grad">${esc(c.hero.h1Gradient)}</span></h1>
       <p class="lead">${esc(c.hero.sub)}</p>
-      <div class="cta-row">${applyBtn("Apply for Cohort 1", "btn-lg")}${fitBtn("Book a 15-min fit call", "btn-lg")}</div>
+      <div class="cta-row">${applyBtn("Apply for Cohort 1", "btn-lg")}</div>
     </div>
     <div class="hero-visual">
       ${pic("/img/3d/hero-sphere", "png", 200, 200, "", "float f-sphere", true)}
@@ -174,9 +170,6 @@ export function renderPage(c) {
           .join("")}</ol>
       </aside>
     </div>
-  </div>
-  <div class="wrap">
-    <ol class="steps-strip">${c.hero.steps.map((s, i) => `<li><span class="ss-n">0${i + 1}</span><span class="ss-t">${esc(s)}</span></li>`).join("")}</ol>
   </div>
 </section>`;
 
@@ -282,7 +275,7 @@ export function renderPage(c) {
         <div class="slider-track">${[0, 1, 2]
           .map((copy) =>
             T.map(
-              (t, i) => `<div class="slide card${copy === 1 && i === 0 ? " is-active" : ""}"${copy === 1 ? ` role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}"` : ' aria-hidden="true" data-clone'}>${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-name">${esc(t.role)}</p><p class="q-role">${esc(t.company)}</p></div>`
+              (t, i) => `<div class="slide card${copy === 1 && i === 0 ? " is-active" : ""}"${copy === 1 ? ` role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}"` : ' aria-hidden="true" data-clone'}>${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote>${t.name ? `<p class="q-name">${esc(t.name)}</p>` : ""}<p class="${t.name ? "q-role" : "q-name"}">${esc(t.role)}, ${esc(t.company)}</p></div>`
             ).join("")
           )
           .join("")}</div>
@@ -451,19 +444,8 @@ export function renderPage(c) {
       .join("")}</div>`,
   };
 
-  const finalCta = {
-    id: "join",
-    cls: "final",
-    html: `
-    <div class="final-card">
-      <h2>${esc(c.finalCta.h2)}</h2>
-      <p class="sec-sub">${S.applicationsCloseDate ? `Applications close ${esc(S.applicationsCloseDate)}. ` : ""}${esc(c.finalCta.sub)}</p>
-      <div class="cta-row">${applyBtn()}${fitBtn("Book a fit call")}</div>
-    </div>`,
-  };
-
   // Alternate white / silver backgrounds across whichever sections are shown.
-  const sections = [why, programme, days, who, proof, faculty, checklist, pricing, apply, faq, finalCta].filter(Boolean);
+  const sections = [why, programme, days, who, proof, faculty, checklist, pricing, apply, faq].filter(Boolean);
   const body = sections
     .map(
       (s, i) => `

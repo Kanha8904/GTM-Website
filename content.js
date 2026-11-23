@@ -157,16 +157,15 @@ export default {
   proof: {
     badge: "5-star rated on Clutch",
     h2: "Here's what our customers say about us",
-    // Verified Clutch reviews, as published on leadstrategus.ai
-    // Clutch reviews, worded exactly as on leadstrategus.com
+    // Clutch reviews. Shown as "Role, Company"; add `name` to show a person's name above it.
     testimonials: [
-      { quote: "They were flexible enough to make any last-minute changes.", role: "Head of Strategic Initiatives", company: "Data management software company, India" },
-      { quote: "I liked the deep interest with which they worked on different aspects.", role: "Founder & CEO", company: "Predictive analytics company, India" },
-      { quote: "Their expertise in digging out information through secondary research at every stage was very impressive.", role: "Director", company: "Global professional services firm, India" },
-      { quote: "LeadStrategus' ABM model is extremely well-researched.", role: "Head of Marketing", company: "IT services company, United States" },
-      { quote: "LeadStrategus's commitment to in-depth understanding exceeded initial project goals.", role: "CEO", company: "IT company, India" },
-      { quote: "They delivered on time and were dedicated to their work.", role: "Director of Technology", company: "IT services firm, India" },
-      { quote: "We had a good time working with LeadStrategus across multiple instances.", role: "Former VP", company: "IT solutions firm, India" },
+      { quote: "LeadStrategus's commitment to in-depth understanding exceeded initial project goals.", role: "CEO", company: "Indus Net Technologies Limited" },
+      { quote: "They were flexible enough to make any last-minute changes.", role: "Head of Strategic Initiatives", company: "Stibo Systems" },
+      { quote: "I liked the deep interest with which they worked on different aspects.", role: "Founder & CEO", company: "Retigence" },
+      { quote: "Their expertise in digging out information through secondary research at every stage was very impressive.", role: "Director", company: "Ernst & Young", name: "Vidya A Mohan" },
+      { quote: "LeadStrategus’ ABM model is extremely well-researched.", role: "Head of Marketing", company: "Speridian" },
+      { quote: "They delivered on time and were dedicated to their work.", role: "Director of Technology", company: "AskMeIdentity" },
+      { quote: "We had a good time working with LeadStrategus across multiple instances.", role: "Former VP", company: "SOA IT Solutions" },
     ],
   },
 
