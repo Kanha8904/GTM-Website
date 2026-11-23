@@ -143,12 +143,6 @@ export default {
     ],
   },
 
-  month: {
-    h2: "The month after. Real sends, reviewed.",
-    sub: "Two live 1-hour sessions a week, online. Private review slots if your data can't be shared.",
-    weeks: ["Scope and data review", "First sends and deliverability", "Replies, results, refine", "Final demo and 90-day plan"],
-  },
-
   who: {
     h2: "For serious practitioners who own pipeline.",
     cards: [
@@ -164,14 +158,15 @@ export default {
     badge: "5-star rated on Clutch",
     h2: "Here's what our customers say about us",
     // Verified Clutch reviews, as published on leadstrategus.ai
+    // Clutch reviews, worded exactly as on leadstrategus.com
     testimonials: [
-      { quote: "LeadStrategus's commitment to in-depth understanding exceeded initial project goals.", name: "Abhishek Rungta", role: "CEO, Indus Net Technologies Limited" },
-      { quote: "They were flexible enough to make any last-minute changes.", name: "Jeffrey Rakesh", role: "Head of Strategic Initiatives, Stibo Systems" },
-      { quote: "I liked the deep interest with which they worked on different aspects.", name: "Srinibas Behera", role: "Founder & CEO, Retigence" },
-      { quote: "Their expertise in digging out information through secondary research at every stage was very impressive.", name: "Vidya A Mohan", role: "Director, Ernst & Young" },
-      { quote: "LeadStrategus' ABM model is extremely well-researched.", name: "Anonymous", role: "Head of Marketing, Speridian" },
-      { quote: "They delivered on time and were dedicated to their work.", name: "Ravi Kumar", role: "Director of Technology, AskMeIdentity" },
-      { quote: "We had a good time working with LeadStrategus across multiple instances.", name: "Prashant Shetty", role: "Former VP, SOA IT Solutions" },
+      { quote: "They were flexible enough to make any last-minute changes.", role: "Head of Strategic Initiatives", company: "Data management software company, India" },
+      { quote: "I liked the deep interest with which they worked on different aspects.", role: "Founder & CEO", company: "Predictive analytics company, India" },
+      { quote: "Their expertise in digging out information through secondary research at every stage was very impressive.", role: "Director", company: "Global professional services firm, India" },
+      { quote: "LeadStrategus' ABM model is extremely well-researched.", role: "Head of Marketing", company: "IT services company, United States" },
+      { quote: "LeadStrategus's commitment to in-depth understanding exceeded initial project goals.", role: "CEO", company: "IT company, India" },
+      { quote: "They delivered on time and were dedicated to their work.", role: "Director of Technology", company: "IT services firm, India" },
+      { quote: "We had a good time working with LeadStrategus across multiple instances.", role: "Former VP", company: "IT solutions firm, India" },
     ],
   },
 
@@ -221,8 +216,6 @@ export default {
   },
 
   footer: {
-    about: "B2B go-to-market, engineered. Strategy, demand generation, intelligence, enablement and custom AI agents, from Bengaluru to wherever you sell.",
-    agentsCta: "The agents live at leadstrategus.ai",
     sites: [
       { name: "LeadStrategus.ai", url: "https://leadstrategus.ai/", text: "AI revenue agents for B2B pipeline automation." },
       { name: "LeadStrategus.com", url: "https://www.leadstrategus.com/", text: "B2B GTM strategy, demand generation and AI agents." },

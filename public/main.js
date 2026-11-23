@@ -126,26 +126,34 @@
     scenes.forEach((el) => so.observe(el));
   } else scenes.forEach((el) => el.classList.add("in-view"));
 
-  /* ---------- review slider: centred card, dots, arrows, swipe, gentle autoplay ---------- */
+  /* ---------- review slider: centred card, endless loop both ways, dots, swipe, autoplay ---------- */
   $$("[data-slider]").forEach((root) => {
     const view = $(".slider-view", root), track = $(".slider-track", root);
     const slides = $$(".slide", root), dots = $$(".dot", root);
-    const n = slides.length;
-    let idx = 0, timer = null, hover = false, visible = false;
-    const place = () => {
+    const n = dots.length; // slides holds 3 copies: [clones][real][clones]
+    let idx = n, timer = null, hover = false, visible = false;
+    const place = (animate = true) => {
       const s = slides[idx];
+      track.style.transition = animate ? "" : "none";
+      slides.forEach((el) => (el.style.transition = animate ? "" : "none"));
       track.style.transform = `translateX(${view.clientWidth / 2 - (s.offsetLeft + s.offsetWidth / 2)}px)`;
+      if (!animate) { void track.offsetWidth; track.style.transition = ""; slides.forEach((el) => (el.style.transition = "")); }
     };
-    const go = (i) => {
-      idx = (i + n) % n;
-      slides.forEach((s, k) => { s.classList.toggle("is-active", k === idx); s.setAttribute("aria-hidden", String(k !== idx)); });
-      dots.forEach((d, k) => { d.classList.toggle("on", k === idx); k === idx ? d.setAttribute("aria-current", "true") : d.removeAttribute("aria-current"); });
-      place();
+    const mark = () => {
+      slides.forEach((s, k) => s.classList.toggle("is-active", k === idx));
+      const real = ((idx % n) + n) % n;
+      dots.forEach((d, k) => { d.classList.toggle("on", k === real); k === real ? d.setAttribute("aria-current", "true") : d.removeAttribute("aria-current"); });
     };
+    const go = (i, animate = true) => { idx = i; mark(); place(animate && !reduceMotion); if (reduceMotion) settle(); };
+    // after a move into the clones, jump silently to the same review in the middle copy
+    const settle = () => {
+      if (idx < n || idx >= 2 * n) { idx = n + (((idx % n) + n) % n); mark(); place(false); }
+    };
+    track.addEventListener("transitionend", (e) => { if (e.target === track) settle(); });
     const stop = () => { clearInterval(timer); timer = null; };
     const start = () => { stop(); if (!reduceMotion && visible && !hover) timer = setInterval(() => go(idx + 1), 6000); };
     $$(".car-btn", root).forEach((b) => b.addEventListener("click", () => { go(idx + +b.dataset.dir); start(); }));
-    dots.forEach((d) => d.addEventListener("click", () => { go(+d.dataset.i); start(); }));
+    dots.forEach((d) => d.addEventListener("click", () => { go(n + +d.dataset.i); start(); }));
     slides.forEach((s, k) => s.addEventListener("click", () => { if (k !== idx) { go(k); start(); } }));
     root.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight") { e.preventDefault(); go(idx + 1); start(); }
@@ -159,8 +167,8 @@
     root.addEventListener("focusin", () => { hover = true; stop(); });
     root.addEventListener("focusout", () => { hover = false; start(); });
     if ("IntersectionObserver" in window) new IntersectionObserver((es) => { visible = es[0].isIntersecting; visible ? start() : stop(); }, { threshold: 0.3 }).observe(root);
-    window.addEventListener("resize", place);
-    go(0);
+    window.addEventListener("resize", () => place(false));
+    go(n, false);
   });
 
   /* ---------- shared POST helper ---------- */

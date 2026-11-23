@@ -159,13 +159,6 @@ export function renderPage(c) {
       <h1>${esc(c.hero.h1Before)}<span class="grad">${esc(c.hero.h1Gradient)}</span></h1>
       <p class="lead">${esc(c.hero.sub)}</p>
       <div class="cta-row">${applyBtn("Apply for Cohort 1", "btn-lg")}${fitBtn("Book a 15-min fit call", "btn-lg")}</div>
-      <div class="hero-proof">
-        <ul class="avatar-stack" aria-hidden="true">${people
-          .filter((f) => f.photo)
-          .map((f) => `<li>${pic("/img/people/" + f.photo, "jpg", 40, 40, "", "", true)}</li>`)
-          .join("")}</ul>
-        <p><span class="stars" aria-hidden="true">★★★★★</span> <strong>${esc(S.clutchRating)} on Clutch</strong><span class="hp-sep" aria-hidden="true">·</span>Taught by the team that runs LeadStrategus</p>
-      </div>
     </div>
     <div class="hero-visual">
       ${pic("/img/3d/hero-sphere", "png", 200, 200, "", "float f-sphere", true)}
@@ -260,12 +253,6 @@ export function renderPage(c) {
       .join("")}</ol>`,
   };
 
-  const month = {
-    id: "month",
-    html: `
-    <div class="sec-head"><h2>${esc(c.month.h2)}</h2><p class="sec-sub">${esc(c.month.sub)}</p></div>
-    <ol class="timeline">${c.month.weeks.map((w, i) => `<li><span class="tl-dot" aria-hidden="true">${i + 1}</span><span class="tl-wk">WEEK ${i + 1}</span><span class="tl-t">${esc(w)}</span></li>`).join("")}</ol>`,
-  };
 
   const who = {
     id: "who",
@@ -294,9 +281,13 @@ export function renderPage(c) {
     </div>
     <div class="slider" data-slider role="region" aria-roledescription="carousel" aria-label="Client reviews from Clutch">
       <div class="slider-view">
-        <div class="slider-track">${T.map(
-          (t, i) => `<div class="slide card${i === 0 ? " is-active" : ""}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}">${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-name">${esc(t.name)}</p><p class="q-role">${esc(t.role)}</p></div>`
-        ).join("")}</div>
+        <div class="slider-track">${[0, 1, 2]
+          .map((copy) =>
+            T.map(
+              (t, i) => `<div class="slide card${copy === 1 && i === 0 ? " is-active" : ""}"${copy === 1 ? ` role="group" aria-roledescription="slide" aria-label="${i + 1} of ${T.length}"` : ' aria-hidden="true" data-clone'}>${stars}<blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-name">${esc(t.role)}</p><p class="q-role">${esc(t.company)}</p></div>`
+            ).join("")
+          )
+          .join("")}</div>
       </div>
       <div class="slider-ctrl">
         <button type="button" class="car-btn" data-dir="-1" aria-label="Previous review">${icon("arrow-right", "flip")}</button>
@@ -474,7 +465,7 @@ export function renderPage(c) {
   };
 
   // Alternate white / silver backgrounds across whichever sections are shown.
-  const sections = [why, programme, days, month, who, proof, faculty, checklist, pricing, apply, faq, finalCta].filter(Boolean);
+  const sections = [why, programme, days, who, proof, faculty, checklist, pricing, apply, faq, finalCta].filter(Boolean);
   const body = sections
     .map(
       (s, i) => `
@@ -566,13 +557,8 @@ ${body}
   <div class="wrap foot-grid">
     <div class="foot-brand">
       <a class="foot-logo" href="#top">${logo("leadstrategus-logo-horizontal", 227, 56, "LeadStrategus logo")}</a>
-      <p class="foot-about">${esc(c.footer.about)}</p>
-      <a class="agents-pill" href="https://leadstrategus.ai/" target="_blank" rel="noopener">${esc(c.footer.agentsCta)} ${icon("arrow-up-right", "ic-sm")}</a>
-    </div>
-    <div class="foot-col">
-      <h2 class="foot-h">LeadStrategus</h2>
       <ul class="foot-sites">${c.footer.sites
-        .map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener"><span class="fs-name">${esc(x.name)} ${icon("arrow-up-right", "ic-sm")}</span><span class="fs-text">${esc(x.text)}</span></a></li>`)
+        .map((x) => `<li><a class="site-pill" href="${esc(x.url)}" target="_blank" rel="noopener"><span class="fs-name">${esc(x.name)} ${icon("arrow-up-right", "ic-sm")}</span><span class="fs-text">${esc(x.text)}</span></a></li>`)
         .join("")}</ul>
     </div>
     <div class="foot-col foot-contact">
@@ -589,7 +575,6 @@ ${body}
   <div class="wrap foot-base">
     <p>© 2026 LeadStrategus Private Limited · ${esc(S.city)}, India</p>
     <ul class="foot-legal"><li><button type="button" class="linkish" data-modal="privacy">Privacy</button></li><li><button type="button" class="linkish" data-modal="terms">Terms</button></li></ul>
-    <p class="foot-tm">Tool names are used for illustration only. We do not own these trademarks.</p>
   </div>
 </footer>
 ${personDialogs}
