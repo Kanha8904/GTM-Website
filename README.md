@@ -33,6 +33,7 @@ No dependencies to install. Node 18+ is enough.
 | `public/fonts/` | Self-hosted Montserrat, Inter and Cinzel Bold (OFL) |
 | `src/icons/` | Lucide icons (ISC), inlined at build time |
 | `scripts/make-brand.py` | Rebuilds `public/brand/`, favicons and app icons from the JPGs in `assets-src/brand/` (needs Pillow + numpy) |
+| `scripts/make-3d.mjs` | Renders the three 3D illustrations in `public/img/3d/` with three.js (scene in `scripts/three/scene.html`; needs Playwright) |
 | `scripts/make-og.mjs` | Regenerates the 1200×630 share image from `scripts/og-template.html` (needs Playwright) |
 
 ## Forms
@@ -57,6 +58,6 @@ GA4, Meta Pixel and LinkedIn Insight load **only** when their IDs are set in `co
 - **Official SVG logo files.** The current logos are cut out of the supplied JPGs (see the TODO in `scripts/make-brand.py`)
 - Cohort dates, seats left, close date, Cohort 1 prices and team discount
 - Fit-call booking link, checklist PDF and capture endpoint
-- Faculty photos, and Kiruba's full name
-- Client quotes (with permission) before turning on `showTestimonials`, and client logo permission before `showClientLogos`
+- Kirubakaran Periyaswamy's confirmed role, bio, photo, LinkedIn and email
+- Client logo permission before turning on `showClientLogos`
 - Approved Privacy Notice and Terms/Refund text, including the Day-1 refund promise

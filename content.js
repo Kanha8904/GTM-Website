@@ -31,21 +31,24 @@ export default {
     priceTeam: "₹60,000", //       TODO [₹ price] per person for a team of 2–3 (carried over; the earlier rule was 3+ seats)
     teamDiscountPct: 14, //        TODO [X]% saving per seat for teams
     fitCallUrl: "", // TODO booking link for the 15-min fit call (Calendly etc.). Empty = opens an email to contactEmail.
-    clutchUrl: "https://clutch.co/profile/leadstrategus", // TODO confirm the Clutch profile URL
+    clutchUrl: "https://clutch.co/profile/leadstrategus",
     checklistEndpoint: "", // where the checklist email-capture POSTs JSON {email}. Empty = no capture, link shown straight away.
     checklistPdfUrl: "", // TODO URL of the "8 questions" PDF. Empty = "we'll email it to you".
     showClientLogos: false, // "Trusted by" strip: turn on only with client permission
-    showTestimonials: false, // "What our clients say": turn on once real quotes with permission exist
-    contactEmail: "info@leadstrategus.com", // TODO confirm
+    showTestimonials: true, // Clutch reviews, as published on leadstrategus.ai
+    contactEmail: "kingshuk@leadstrategus.com", // same contact address as leadstrategus.com
+    address: "Bizzhub, Brigade Tech Park, near ITPL Main Road, Pattandur Agrahara, Whitefield, Bengaluru, Karnataka 560066",
     whatsapp: "", // digits incl. country code, e.g. "9198xxxxxxxx". Empty = hidden.
     whatsappMessage: "Hi LeadStrategus, I have a question about the GTM Engineering Workshop.",
-    linkedin: "https://www.linkedin.com/company/leadstrategus/", // TODO confirm
+    linkedin: "https://www.linkedin.com/company/leadstrategus/",
+    instagram: "https://www.instagram.com/leadstrategus/",
+    clutchRating: "5.0",
     city: "Bengaluru",
     responseHours: 48,
   },
 
   site: {
-    url: "https://workshop.leadstrategus.com", // TODO final live URL (used for canonical, OG and JSON-LD)
+    url: "https://gtm.leadstrategus.ai", // TODO confirm the final address of this extension of leadstrategus.ai (used for canonical, OG and JSON-LD)
     name: "GTM Engineering Workshop",
     title: "GTM Engineering Workshop, Bengaluru | LeadStrategus",
     description:
@@ -70,7 +73,6 @@ export default {
   // 3. PAGE COPY (from the GTM Workshop look-and-feel snapshot)
   // ---------------------------------------------------------------------------
   hero: {
-    eyebrow: "5-DAY INTENSIVE · 1-MONTH IMPLEMENTATION · BENGALURU",
     h1Before: "Outbound, ",
     h1Gradient: "engineered.",
     sub: "Beyond the AI hype. Design, build and test a complete outbound prospecting engine for your own business — target logic, signals, scoring, messaging and measurement. Taught by operators who ran marketing at AWS, Gartner and SAP.",
@@ -98,7 +100,6 @@ export default {
   },
 
   programme: {
-    eyebrow: "THE PROGRAMME · 8 STAGES · 3 GATES · 5 DAYS + 1 MONTH",
     h2: "8 stages. 3 human gates. One engine.",
     intro: "This isn't a course. It's a build. About 30% principles, 70% building on your own business. You leave with a working, documented engine and a plan to run it.",
     stages: [
@@ -160,13 +161,17 @@ export default {
   },
 
   proof: {
-    badge: "5-STAR RATED ON CLUTCH",
-    h2: "What our clients say.",
+    badge: "5-star rated on Clutch",
+    h2: "Here's what our customers say about us",
+    // Verified Clutch reviews, as published on leadstrategus.ai
     testimonials: [
-      // TODO: real quotes, used with permission
-      { quote: "[Client quote with permission]", role: "[Role]", company: "[Company type, country]" },
-      { quote: "[Client quote with permission]", role: "[Role]", company: "[Company type, country]" },
-      { quote: "[Client quote with permission]", role: "[Role]", company: "[Company type, country]" },
+      { quote: "LeadStrategus's commitment to in-depth understanding exceeded initial project goals.", name: "Abhishek Rungta", role: "CEO, Indus Net Technologies Limited" },
+      { quote: "They were flexible enough to make any last-minute changes.", name: "Jeffrey Rakesh", role: "Head of Strategic Initiatives, Stibo Systems" },
+      { quote: "I liked the deep interest with which they worked on different aspects.", name: "Srinibas Behera", role: "Founder & CEO, Retigence" },
+      { quote: "Their expertise in digging out information through secondary research at every stage was very impressive.", name: "Vidya A Mohan", role: "Director, Ernst & Young" },
+      { quote: "LeadStrategus' ABM model is extremely well-researched.", name: "Anonymous", role: "Head of Marketing, Speridian" },
+      { quote: "They delivered on time and were dedicated to their work.", name: "Ravi Kumar", role: "Director of Technology, AskMeIdentity" },
+      { quote: "We had a good time working with LeadStrategus across multiple instances.", name: "Prashant Shetty", role: "Former VP, SOA IT Solutions" },
     ],
   },
 
@@ -174,9 +179,27 @@ export default {
     h2: "An operating firm that trains.",
     sub: "Everything we teach, we run for clients every week.",
     people: [
-      { name: "Kingshuk Hazra", focus: "Strategy, segmentation, messaging", photo: "", linkedin: "" }, // TODO photo "/brand/people/kingshuk.webp"
-      { name: "Komala Maran", focus: "Workflows and the judgement layer", photo: "", linkedin: "" },
-      { name: "Kiruba", focus: "Technical build and infrastructure", photo: "", linkedin: "" }, // TODO [Kiruba] confirm full name
+      {
+        name: "Kingshuk Hazra", role: "Founder", photo: "kingshuk-hazra",
+        bio: "Former Head of Marketing, Amazon Web Services India. Two decades across marketing, business-development analytics and advisory at SAP, Oracle, IBM, Gartner, Pluralsight and IMRB.",
+        more: "https://www.leadstrategus.com/about", linkedin: "https://www.linkedin.com/in/kingshuk/", email: "kingshuk@leadstrategus.com",
+      },
+      {
+        name: "Anindita Hazra", role: "Co-founder", photo: "anindita-hazra",
+        bio: "Co-founder of LeadStrategus. Leads client delivery across demand generation and sales enablement.",
+        more: "https://www.leadstrategus.com/about", linkedin: "https://www.linkedin.com/in/aninditahazra/", email: "anindita@leadstrategus.com",
+      },
+      {
+        name: "Komala Maran", role: "Head Go-To-Market & Growth", photo: "komala-maran",
+        bio: "Leads Go-To-Market and Market Intelligence at LeadStrategus. Built the firm’s Market Insights and Open Source Intelligence practice. An IT engineer from IIIT Allahabad.",
+        more: "https://www.leadstrategus.com/about", linkedin: "https://www.linkedin.com/in/komalamaran/", email: "komala.m@leadstrategus.com",
+      },
+      {
+        // TODO: not on leadstrategus.com yet. Confirm role and bio; add photo ("kirubakaran-periyaswamy" → public/img/people/), LinkedIn and email.
+        name: "Kirubakaran Periyaswamy", role: "Technical Lead", photo: "",
+        bio: "Leads the technical build and infrastructure behind our engines: Clay, n8n, HubSpot and AI workflows.",
+        more: "", linkedin: "", email: "",
+      },
     ],
   },
 

@@ -119,6 +119,26 @@
     $$("[data-close]", d).forEach((b) => b.addEventListener("click", () => d.close()));
   });
 
+  /* ---------- review carousel (scroll-snap; buttons move one card) ---------- */
+  $$("[data-carousel]").forEach((car) => {
+    const track = $(".car-track", car);
+    const [prev, next] = $$(".car-btn", car);
+    const sync = () => {
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    };
+    const step = (dir) => {
+      const card = track.firstElementChild;
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 16;
+      track.scrollBy({ left: dir * (card.getBoundingClientRect().width + gap), behavior: reduceMotion ? "auto" : "smooth" });
+    };
+    prev.addEventListener("click", () => step(-1));
+    next.addEventListener("click", () => step(1));
+    track.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    sync();
+  });
+
   /* ---------- shared POST helper ---------- */
   const postJSON = async (url, payload) => {
     const ctrl = new AbortController();

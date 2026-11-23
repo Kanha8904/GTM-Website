@@ -28,6 +28,12 @@ const logo = (name, w, h, alt, cls = "", eager = false) => `<picture class="${cl
       <img src="/brand/${name}@1x.png" srcset="/brand/${name}@1x.png 1x, /brand/${name}@2x.png 2x" width="${w}" height="${h}" alt="${esc(alt)}"${eager ? ' fetchpriority="high"' : ' loading="lazy"'} decoding="async">
     </picture>`;
 
+/** Decorative 3D illustration (rendered by scripts/make-3d.mjs). */
+const art = (name, w, h) => `<picture class="sec-art art-${name}">
+      <source type="image/webp" srcset="/img/3d/${name}@1x.webp 1x, /img/3d/${name}@2x.webp 2x">
+      <img src="/img/3d/${name}@1x.png" srcset="/img/3d/${name}@1x.png 1x, /img/3d/${name}@2x.png 2x" width="${w}" height="${h}" alt="" loading="lazy" decoding="async">
+    </picture>`;
+
 const initials = (name) => name.replace(/[^\p{L}\s]/gu, "").split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 const digits = (s) => String(s || "").replace(/[^\d]/g, "");
 
@@ -56,7 +62,7 @@ export function renderPage(c) {
     logo: ogUrl + "/brand/leadstrategus-logo-stacked.png",
     image: ogUrl + "/brand/leadstrategus-shield.png",
     slogan: "Superpower your sales!",
-    sameAs: ["https://leadstrategus.com", "https://leadstrategus.ai", "https://expotofunnel.com", S.linkedin].filter(Boolean),
+    sameAs: ["https://leadstrategus.com", "https://leadstrategus.ai", "https://expotofunnel.com", S.linkedin, S.instagram].filter(Boolean),
   };
   const offers = [
     digits(S.priceIndividual) && { "@type": "Offer", name: "Individual", price: digits(S.priceIndividual), priceCurrency: "INR", url: ogUrl + "/#pricing", category: "Paid", description: "Price before GST" },
@@ -113,7 +119,6 @@ export function renderPage(c) {
 <section class="hero" id="top">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">${esc(c.hero.eyebrow)}</p>
       <h1>${esc(c.hero.h1Before)}<span class="grad">${esc(c.hero.h1Gradient)}</span></h1>
       <p class="lead">${esc(c.hero.sub)}</p>
       <div class="cta-row">${applyBtn()}${fitBtn()}</div>
@@ -143,7 +148,7 @@ export function renderPage(c) {
   const why = {
     id: "why",
     html: `
-    <div class="sec-head"><p class="eyebrow">Why it's different</p><h2>${esc(c.why.h2)}</h2><p class="sec-sub">${esc(c.why.intro)}</p></div>
+    <div class="sec-head with-art"><div><h2>${esc(c.why.h2)}</h2><p class="sec-sub">${esc(c.why.intro)}</p></div>${art("target", 398, 378)}</div>
     <div class="cols-3">${c.why.cols.map((k) => `<article class="card why-card">${icon(k.icon, "ic-lg")}<h3>${esc(k.title)}</h3><p>${esc(k.text)}</p></article>`).join("")}</div>`,
   };
 
@@ -151,7 +156,7 @@ export function renderPage(c) {
   const programme = {
     id: "programme",
     html: `
-    <div class="sec-head"><p class="eyebrow">${esc(c.programme.eyebrow)}</p><h2>${esc(c.programme.h2)}</h2><p class="sec-sub">${esc(c.programme.intro)}</p></div>
+    <div class="sec-head with-art wide-art"><div><h2>${esc(c.programme.h2)}</h2><p class="sec-sub">${esc(c.programme.intro)}</p></div>${art("pipeline", 500, 123)}</div>
     <div class="ptable-wrap">
       <table class="ptable">
         <caption class="sr-only">The 8 stages: what you build, the tools, what you leave with, and who is in control</caption>
@@ -173,7 +178,7 @@ export function renderPage(c) {
   const days = {
     id: "days",
     html: `
-    <div class="sec-head"><p class="eyebrow">Format</p><h2>${esc(c.days.h2)}</h2></div>
+    <div class="sec-head"><h2>${esc(c.days.h2)}</h2></div>
     <div class="cols-2">${c.days.summary
       .map((d, i) => `<article class="card sum-card ${i ? "online" : "inperson"}"><p class="tag-line">${esc(d.tag)}</p><p class="sum-big"><span>${esc(d.big)}</span> ${esc(d.unit)}</p><p>${esc(d.text)}</p></article>`)
       .join("")}</div>
@@ -186,14 +191,14 @@ export function renderPage(c) {
   const month = {
     id: "month",
     html: `
-    <div class="sec-head"><p class="eyebrow">Implementation</p><h2>${esc(c.month.h2)}</h2><p class="sec-sub">${esc(c.month.sub)}</p></div>
+    <div class="sec-head"><h2>${esc(c.month.h2)}</h2><p class="sec-sub">${esc(c.month.sub)}</p></div>
     <ol class="timeline">${c.month.weeks.map((w, i) => `<li><span class="tl-dot" aria-hidden="true">${i + 1}</span><span class="tl-wk">WEEK ${i + 1}</span><span class="tl-t">${esc(w)}</span></li>`).join("")}</ol>`,
   };
 
   const stack = {
     id: "stack",
     html: `
-    <div class="sec-head"><p class="eyebrow">Stack</p><h2>${esc(c.stack.h2)}</h2></div>
+    <div class="sec-head with-art"><div><h2>${esc(c.stack.h2)}</h2></div>${art("layers", 371, 329)}</div>
     <ul class="stack-cols">${c.stack.cols.map((s) => `<li class="card"><span class="tag-line">${esc(s.label)}</span><span class="stack-tool">${esc(s.tools)}</span></li>`).join("")}</ul>
     <p class="demo-only"><span class="tag-line">DEMO ONLY</span> ${esc(c.stack.demoOnly)}</p>
     <p class="footnote">Tool names and logos are used for illustration only. We do not own these trademarks.</p>`,
@@ -202,7 +207,7 @@ export function renderPage(c) {
   const who = {
     id: "who",
     html: `
-    <div class="sec-head"><p class="eyebrow">Who it's for</p><h2>${esc(c.who.h2)}</h2></div>
+    <div class="sec-head"><h2>${esc(c.who.h2)}</h2></div>
     <div class="cols-4">${c.who.cards
       .map(
         (k) => `<article class="card who-card">${icon(k.icon, "ic-lg")}<h3>${esc(k.title)}</h3><p>${
@@ -213,36 +218,47 @@ export function renderPage(c) {
     <p class="note note-strong">${esc(c.who.note)}</p>`,
   };
 
+  const stars = `<span class="stars" aria-label="5 out of 5 stars">★★★★★</span>`;
   const proof = {
     id: "proof",
     cls: S.showTestimonials ? "" : "proof-slim",
-    html: `
+    html: S.showTestimonials
+      ? `
     <div class="proof-head">
-      <a class="clutch" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener"><span class="stars" aria-hidden="true">★★★★★</span> ${esc(c.proof.badge)} ${icon("arrow-right", "ic-sm")}</a>
-      ${S.showTestimonials ? `<h2>${esc(c.proof.h2)}</h2>` : ""}
+      <h2>${esc(c.proof.h2)}</h2>
+      <a class="clutch" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${stars} ${esc(c.proof.badge)} ${icon("arrow-up-right", "ic-sm")}</a>
     </div>
-    ${
-      S.showTestimonials
-        ? `<div class="cols-3">${c.proof.testimonials
-            .map((t) => `<figure class="card quote">${icon("quote", "ic-lg")}<blockquote><p>${esc(t.quote)}</p></blockquote><figcaption><strong>${esc(t.role)}</strong><span>${esc(t.company)}</span></figcaption></figure>`)
-            .join("")}</div>`
-        : ""
-    }`,
+    <div class="carousel" data-carousel>
+      <ul class="car-track" tabindex="0" aria-label="Client reviews from Clutch">${c.proof.testimonials
+        .map((t) => `<li class="card quote"><span class="stars" aria-hidden="true">★★★★★</span><blockquote><p>“${esc(t.quote)}”</p></blockquote><p class="q-name">${esc(t.name)}</p><p class="q-role">${esc(t.role)}</p></li>`)
+        .join("")}</ul>
+      <div class="car-ctrl">
+        <button type="button" class="car-btn" data-dir="-1" aria-label="Previous reviews">${icon("arrow-right", "flip")}</button>
+        <button type="button" class="car-btn" data-dir="1" aria-label="Next reviews">${icon("arrow-right")}</button>
+      </div>
+    </div>`
+      : `<div class="proof-head"><a class="clutch" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${stars} ${esc(c.proof.badge)} ${icon("arrow-up-right", "ic-sm")}</a></div>`,
   };
 
+  const photo = (f) =>
+    f.photo
+      ? `<picture class="avatar-wrap"><source type="image/webp" srcset="/img/people/${f.photo}@1x.webp 1x, /img/people/${f.photo}@2x.webp 2x"><img class="avatar" src="/img/people/${f.photo}@1x.jpg" srcset="/img/people/${f.photo}@1x.jpg 1x, /img/people/${f.photo}@2x.jpg 2x" alt="${esc(f.name)}" width="104" height="104" loading="lazy" decoding="async"></picture>`
+      : `<span class="avatar avatar-ph" aria-hidden="true">${initials(f.name)}</span>`;
   const faculty = {
     id: "faculty",
     html: `
-    <div class="sec-head"><p class="eyebrow">Faculty</p><h2>${esc(c.faculty.h2)}</h2><p class="sec-sub">${esc(c.faculty.sub)}</p></div>
-    <div class="cols-3">${c.faculty.people
+    <div class="sec-head"><h2>${esc(c.faculty.h2)}</h2><p class="sec-sub">${esc(c.faculty.sub)}</p></div>
+    <div class="team">${c.faculty.people
       .map(
-        (f) => `<article class="card person">${
-          f.photo
-            ? `<img class="avatar" src="${esc(f.photo)}" alt="${esc(f.name)}" width="96" height="96" loading="lazy" decoding="async">`
-            : `<span class="avatar avatar-ph" aria-hidden="true">${initials(f.name)}</span>`
-        }<h3>${esc(f.name)}</h3><p>${esc(f.focus)}</p>${
-          f.linkedin ? `<a class="li-link" href="${esc(f.linkedin)}" target="_blank" rel="noopener">${icon("linkedin")} LinkedIn</a>` : ""
-        }</article>`
+        (f) => `<article class="card person">
+          <div class="person-top">${photo(f)}<p class="person-role">${esc(f.role)}</p></div>
+          <h3>${esc(f.name)}</h3>
+          <p class="person-bio">${esc(f.bio)}</p>
+          ${f.more ? `<a class="more" href="${esc(f.more)}" target="_blank" rel="noopener">More about ${esc(f.name.split(" ")[0])} ${icon("arrow-up-right", "ic-sm")}</a>` : ""}
+          ${f.linkedin || f.email ? `<div class="person-links">${f.linkedin ? `<a class="icon-btn" href="${esc(f.linkedin)}" target="_blank" rel="noopener" aria-label="${esc(f.name)} on LinkedIn">${icon("linkedin")}</a>` : ""}${
+            f.email ? `<a class="icon-btn" href="mailto:${esc(f.email)}" aria-label="Email ${esc(f.name)}">${icon("mail")}</a>` : ""
+          }</div>` : ""}
+        </article>`
       )
       .join("")}</div>`,
   };
@@ -270,7 +286,7 @@ export function renderPage(c) {
   const pricing = {
     id: "pricing",
     html: `
-    <div class="sec-head"><p class="eyebrow">COHORT 1 · ${esc(S.city.toUpperCase())} · ${esc(S.dates.toUpperCase())}</p><h2>${esc(P.h2)}</h2><p class="sec-sub">${esc(P.sub)}</p></div>
+    <div class="sec-head"><h2>${esc(P.h2)}</h2><p class="sec-sub">${esc(P.sub)}</p></div>
     <div class="prices">
       <article class="card price">
         <p class="tag-line">INDIVIDUAL</p>
@@ -301,7 +317,6 @@ export function renderPage(c) {
     html: `
     <div class="apply-grid">
       <div class="apply-copy">
-        <p class="eyebrow">Apply</p>
         <h2 class="h2-bar">${esc(A.h2)}</h2>
         <p class="sec-sub">${esc(A.sub)}</p>
         <ul class="trust">${A.trust.map((t) => `<li>${icon("check")}${esc(t)}</li>`).join("")}</ul>
@@ -360,7 +375,7 @@ export function renderPage(c) {
     id: "faq",
     narrow: true,
     html: `
-    <div class="sec-head"><p class="eyebrow">FAQ</p><h2>Questions, answered plainly.</h2></div>
+    <div class="sec-head"><h2>Questions, answered plainly.</h2></div>
     <div class="faq">${c.faq
       .map((f, i) => `<details class="faq-item"${i === 0 ? " open" : ""}><summary><span>${esc(f.q)}</span>${icon("plus", "faq-ic")}</summary><div class="faq-a"><p>${esc(f.a)}</p></div></details>`)
       .join("")}</div>`,
@@ -466,18 +481,31 @@ ${body}
 
 <footer class="site-footer">
   <div class="wrap foot-grid">
-    <a class="foot-logo" href="#top">${logo("leadstrategus-logo-horizontal", 227, 56, "LeadStrategus logo")}</a>
-    <ul class="foot-links">
-      <li><a href="https://leadstrategus.com" rel="noopener" target="_blank">leadstrategus.com</a></li>
-      <li><a href="https://leadstrategus.ai" rel="noopener" target="_blank">leadstrategus.ai</a></li>
-      <li><a href="https://expotofunnel.com" rel="noopener" target="_blank">expotofunnel.com</a></li>
-    </ul>
-    <ul class="foot-links">
+    <div class="foot-brand">
+      <a class="foot-logo" href="#top">${logo("leadstrategus-logo-horizontal", 227, 56, "LeadStrategus logo")}</a>
+      <p class="foot-note">The GTM Engineering Workshop is part of <a href="https://leadstrategus.ai/" target="_blank" rel="noopener">LeadStrategus.ai</a>.</p>
+      <ul class="foot-sites">
+        <li><a href="https://leadstrategus.ai/" rel="noopener" target="_blank">leadstrategus.ai</a></li>
+        <li><a href="https://www.leadstrategus.com/" rel="noopener" target="_blank">leadstrategus.com</a></li>
+        <li><a href="https://expotofunnel.com/" rel="noopener" target="_blank">expotofunnel.com</a></li>
+      </ul>
+    </div>
+    <div class="foot-contact">
+      <h2 class="foot-h">Contact</h2>
+      <a class="foot-mail" href="mailto:${esc(S.contactEmail)}">${esc(S.contactEmail)}</a>
+      ${S.address ? `<address>${esc(S.address)}</address>` : ""}
+      <div class="socials">
+        ${S.linkedin ? `<a class="icon-btn" href="${esc(S.linkedin)}" target="_blank" rel="noopener" aria-label="LeadStrategus on LinkedIn">${icon("linkedin")}</a>` : ""}
+        ${S.instagram ? `<a class="icon-btn" href="${esc(S.instagram)}" target="_blank" rel="noopener" aria-label="LeadStrategus on Instagram">${icon("instagram")}</a>` : ""}
+        <a class="clutch-pill" href="${esc(S.clutchUrl)}" target="_blank" rel="noopener">${icon("star", "star-ic")} ${esc(S.clutchRating)} on Clutch</a>
+      </div>
+    </div>
+    <ul class="foot-legal">
       <li><button type="button" class="linkish" data-modal="privacy">Privacy</button></li>
       <li><button type="button" class="linkish" data-modal="terms">Terms</button></li>
     </ul>
   </div>
-  <div class="wrap foot-base"><p>© 2026 LeadStrategus · ${esc(S.city)}</p></div>
+  <div class="wrap foot-base"><p>© 2026 LeadStrategus Private Limited · ${esc(S.city)}, India</p></div>
 </footer>
 
 <div class="mobile-bar" id="mobile-bar">${applyBtn(`Apply for Cohort 1 <span class="mb-sub">· ${seats} seats</span>`, "btn-block")}</div>
