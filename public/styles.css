@@ -549,3 +549,4 @@ body.modal-open { overflow: hidden; }
 .buildlog ol { padding: 10px 0; }
 .nav a, .nav-cta { white-space: nowrap; }
 @media (min-width: 1024px) and (max-width: 1360px) { .brand-div, .brand-sub { display: none; } .nav a { padding: 8px 9px; } }
+.person[data-open] { cursor: pointer; }

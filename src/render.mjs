@@ -308,7 +308,7 @@ export function renderPage(c) {
     <div class="sec-head"><h2>${esc(c.faculty.h2)}</h2><p class="sec-sub">${esc(c.faculty.sub)}</p></div>
     <div class="team">${people
       .map(
-        (f, k) => `<article class="card person">
+        (f, k) => `<article class="card person"${f.long && f.long.length ? ` data-open="person-${k}"` : ""}>
           <div class="person-top">${photo(f)}<p class="person-role">${esc(f.role)}</p></div>
           <h3>${esc(f.name)}</h3>
           <p class="person-bio">${esc(f.bio)}</p>

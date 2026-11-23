@@ -113,6 +113,12 @@
     document.body.classList.add("modal-open");
     const x = $(".modal-x", d); x && x.focus();
   }));
+  // Team cards: a click anywhere on the card opens the profile, except on its own links and buttons.
+  $$("[data-open]").forEach((card) => card.addEventListener("click", (e) => {
+    if (e.target.closest("a, button")) return;
+    const btn = $(`[data-modal="${card.dataset.open}"]`, card);
+    if (btn) btn.click();
+  }));
   $$("dialog.modal").forEach((d) => {
     d.addEventListener("close", () => { document.body.classList.remove("modal-open"); lastFocus && lastFocus.focus(); });
     d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
