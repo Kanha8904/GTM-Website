@@ -166,7 +166,6 @@ export function renderPage(c) {
       ${pic("/img/3d/hero-cube", "png", 200, 216, "", "float f-cube", true)}
       ${pic("/img/3d/hero-pill", "png", 200, 193, "", "float f-pill", true)}
       <aside class="card buildlog" aria-label="Your engine build log (illustrative)">
-        <div class="bl-head"><span><span class="live-dot" aria-hidden="true"></span>YOUR ENGINE · BUILD LOG</span><span class="tag">ILLUSTRATIVE</span></div>
         <ol>${c.hero.buildLog
           .map(
             (r, i) => `<li style="--i:${i}"><span class="bl-when">${esc(r.when)}</span><span class="bl-text">${esc(r.text)}</span>${
@@ -478,9 +477,10 @@ export function renderPage(c) {
     .join("\n");
 
   const nav = [
+    ["top", "Home"],
     ["programme", "Programme"],
     ["who", "Who it's for"],
-    ["faculty", "Faculty"],
+    ["faculty", "Meet our team"],
     ["pricing", "Pricing"],
   ];
 

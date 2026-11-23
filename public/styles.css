@@ -161,7 +161,8 @@ button { font: inherit; color: inherit; }
     radial-gradient(circle at 1px 1px, rgba(11, 42, 107, .13) 1px, transparent 0) 0 0 / 26px 26px;
   -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent); mask-image: linear-gradient(180deg, #000 55%, transparent); }
 .hero-grid { display: grid; gap: 48px; align-items: center; }
-.hero h1 { font-size: clamp(48px, 12vw, 128px); font-weight: 800; letter-spacing: -.045em; line-height: .95; }
+.hero-copy { container-type: inline-size; min-width: 0; }
+.hero h1 { font-size: clamp(44px, 14.5cqi, 128px); font-weight: 800; letter-spacing: -.045em; line-height: .95; }
 .hero h1 .grad { display: inline-block; padding-bottom: .08em; background-size: 200% 100%; }
 @media (prefers-reduced-motion: no-preference) { .hero h1 .grad { animation: grad-shift 6s ease-in-out infinite alternate; } @keyframes grad-shift { to { background-position: 100% 0; } } }
 .hero .lead { margin-top: 26px; font-size: clamp(17px, 1.5vw, 20px); line-height: 1.6; max-width: 60ch; }
@@ -517,7 +518,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .clutch-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-input); background: var(--card); font: 600 15px var(--f-head); color: var(--navy); text-decoration: none; }
 .clutch-pill:hover { border-color: var(--blue); }
 .star-ic { width: 16px; height: 16px; color: var(--red); fill: var(--red); }
-@media (min-width: 860px) { .foot-grid { grid-template-columns: 1fr auto; gap: 64px; } .foot-contact { justify-self: end; } }
+@media (min-width: 860px) { .foot-grid { grid-template-columns: 1fr auto; gap: 64px; } .foot-contact { justify-self: end; padding-top: 110px; } }
 .foot-base { margin-top: 40px; padding-top: 20px; border-top: 1px solid #D5DBE5; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; font-size: 13px; color: var(--ink-3); }
 .foot-legal { display: flex; gap: 18px; }
 .foot-legal .linkish { color: var(--ink-2); text-decoration: none; font-size: 13px; min-height: 32px; }
@@ -545,3 +546,6 @@ body.modal-open { overflow: hidden; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
 }
 @media (min-width: 960px) { .anim-target { max-width: 100%; } }
+.buildlog ol { padding: 10px 0; }
+.nav a, .nav-cta { white-space: nowrap; }
+@media (min-width: 1024px) and (max-width: 1360px) { .brand-div, .brand-sub { display: none; } .nav a { padding: 8px 9px; } }
