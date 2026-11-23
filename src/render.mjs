@@ -130,26 +130,24 @@ export function renderPage(c) {
   <svg class="hero-rings" viewBox="0 0 560 430" role="img" aria-labelledby="hv-t">
     <title id="hv-t">AI for the heavy lifting, plus human judgement for the hard calls, equals effective outbound</title>
     <defs>
-      <linearGradient id="hv-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DB4FF"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
-      <linearGradient id="hv-warm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8A5B"/><stop offset=".55" stop-color="#F2545B"/><stop offset="1" stop-color="#E25FD0"/></linearGradient>
-      <radialGradient id="hv-fb" cx=".45" cy=".45" r=".6"><stop offset="0" stop-color="#3B82F6" stop-opacity=".30"/><stop offset="1" stop-color="#3B82F6" stop-opacity=".04"/></radialGradient>
-      <radialGradient id="hv-fw" cx=".55" cy=".45" r=".6"><stop offset="0" stop-color="#F2545B" stop-opacity=".28"/><stop offset="1" stop-color="#E25FD0" stop-opacity=".04"/></radialGradient>
+      <linearGradient id="hv-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+      <linearGradient id="hv-warm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2545B"/><stop offset=".55" stop-color="#D9468F"/><stop offset="1" stop-color="#7C4DFF"/></linearGradient>
     </defs>
-    <circle class="ring ring-a" cx="200" cy="190" r="152" fill="url(#hv-fb)" stroke="url(#hv-blue)" stroke-width="3"/>
-    <circle class="ring ring-b" cx="360" cy="190" r="152" fill="url(#hv-fw)" stroke="url(#hv-warm)" stroke-width="3"/>
-    <g transform="translate(108 92)" color="#93C5FD">${icon("cpu").replace('class="ic "', 'width="36" height="36"')}</g>
-    <text x="126" y="172" text-anchor="middle" class="r-big" fill="#BFDBFE">AI</text>
-    <text x="126" y="206" text-anchor="middle" class="r-sm" fill="#DBEAFE">for the</text>
-    <text x="126" y="232" text-anchor="middle" class="r-sm r-b" fill="#fff">heavy lifting</text>
-    <g transform="translate(416 92)" color="#FDBA9A">${icon("brain").replace('class="ic "', 'width="36" height="36"')}</g>
-    <text x="434" y="166" text-anchor="middle" class="r-md" fill="#FFD3C2">Human</text>
-    <text x="434" y="192" text-anchor="middle" class="r-md" fill="#FFD3C2">judgement</text>
-    <text x="434" y="222" text-anchor="middle" class="r-sm" fill="#FDE2EC">for the</text>
-    <text x="434" y="248" text-anchor="middle" class="r-sm r-b" fill="#fff">hard calls</text>
-    <circle cx="280" cy="190" r="30" fill="#0B1030" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>
-    <path d="M280 176v28M266 190h28" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-    <rect x="150" y="370" width="260" height="46" rx="23" fill="#0B1030" stroke="url(#hv-warm)" stroke-width="2"/>
-    <text x="280" y="400" text-anchor="middle" class="r-sm r-b" fill="#fff">= Effective outbound</text>
+    <circle class="ring ring-a" cx="200" cy="190" r="152" fill="#2563EB" fill-opacity=".07" stroke="url(#hv-blue)" stroke-width="3"/>
+    <circle class="ring ring-b" cx="360" cy="190" r="152" fill="#F2545B" fill-opacity=".07" stroke="url(#hv-warm)" stroke-width="3"/>
+    <g transform="translate(108 92)" color="#2563EB">${icon("cpu").replace('class="ic "', 'width="36" height="36"')}</g>
+    <text x="126" y="172" text-anchor="middle" class="r-big" fill="#1D4ED8">AI</text>
+    <text x="126" y="206" text-anchor="middle" class="r-sm" fill="#3F3D56">for the</text>
+    <text x="126" y="232" text-anchor="middle" class="r-sm r-b" fill="#0F0C29">heavy lifting</text>
+    <g transform="translate(416 92)" color="#C7303A">${icon("brain").replace('class="ic "', 'width="36" height="36"')}</g>
+    <text x="434" y="166" text-anchor="middle" class="r-md" fill="#C7303A">Human</text>
+    <text x="434" y="192" text-anchor="middle" class="r-md" fill="#C7303A">judgement</text>
+    <text x="434" y="222" text-anchor="middle" class="r-sm" fill="#3F3D56">for the</text>
+    <text x="434" y="248" text-anchor="middle" class="r-sm r-b" fill="#0F0C29">hard calls</text>
+    <circle cx="280" cy="190" r="30" fill="#FFFFFF" stroke="#0F0C29" stroke-opacity=".18" stroke-width="2"/>
+    <path d="M280 176v28M266 190h28" stroke="#0F0C29" stroke-width="4" stroke-linecap="round"/>
+    <rect x="150" y="370" width="260" height="46" rx="23" fill="#FFFFFF" stroke="url(#hv-warm)" stroke-width="2"/>
+    <text x="280" y="400" text-anchor="middle" class="r-sm r-b" fill="#0F0C29">= Effective outbound</text>
   </svg>`;
 
   const problemRows = [
@@ -279,8 +277,8 @@ export function renderPage(c) {
 <title>${esc(c.site.title)}</title>
 <meta name="description" content="${esc(metaDesc)}">
 <link rel="canonical" href="${esc(ogUrl)}/">
-<meta name="theme-color" content="#070B1F">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LeadStrategus">
 <meta property="og:title" content="${esc(`${p.name}: ${p.tagline} | ${p.city}`)}">
@@ -599,7 +597,6 @@ export function renderPage(c) {
 
 <!-- 13. APPLY -->
 <section class="section apply" id="apply">
-  <div class="glow glow-3" aria-hidden="true"></div>
   <div class="wrap wrap-narrow">
     <div class="sec-head">
       <p class="eyebrow">Apply</p>

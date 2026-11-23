@@ -12,7 +12,7 @@ await p.evaluate(() => document.fonts.ready);
 await p.screenshot({ path: r("../public/img/og-image.png") });
 for (const [size, name] of [[32, "favicon-32.png"], [180, "apple-touch-icon.png"]]) {
   await p.setViewportSize({ width: size, height: size });
-  await p.setContent(`<body style="margin:0;background:#070B1F;display:grid;place-items:center;width:${size}px;height:${size}px"><img src="file://${r("../public/img/favicon.svg")}" style="height:${Math.round(size * 0.8)}px"></body>`);
+  await p.setContent(`<body style="margin:0;background:#FFFFFF;display:grid;place-items:center;width:${size}px;height:${size}px"><img src="file://${r("../public/img/favicon.svg")}" style="height:${Math.round(size * 0.8)}px"></body>`);
   await p.waitForTimeout(100);
   await p.screenshot({ path: r("../public/img/" + name) });
 }
