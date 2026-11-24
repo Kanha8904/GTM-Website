@@ -100,7 +100,7 @@ export function renderPage(c) {
   };
   const offers = [
     digits(S.priceIndividual) && { "@type": "Offer", name: "Individual", price: digits(S.priceIndividual), priceCurrency: "INR", url: ogUrl + "/#pricing", category: "Paid", description: "Price before GST" },
-    digits(S.priceTeam) && { "@type": "Offer", name: "Team of 2–3, per person", price: digits(S.priceTeam), priceCurrency: "INR", url: ogUrl + "/#pricing", category: "Paid", description: "Price per person before GST" },
+    digits(S.priceTeam) && { "@type": "Offer", name: "Team of 3+, per person", price: digits(S.priceTeam), priceCurrency: "INR", url: ogUrl + "/#pricing", category: "Paid", description: "Price per person before GST" },
   ].filter(Boolean);
   const place = {
     "@type": "Place",
@@ -351,7 +351,7 @@ export function renderPage(c) {
       </article>
       <article class="card price featured">
         <span class="badge">RECOMMENDED</span>
-        <p class="tag-line">TEAM OF 2–3</p>
+        <p class="tag-line">TEAM OF 3+</p>
         <p class="price-val">${esc(S.priceTeam)} <span>per person + GST</span></p>
         <ul class="ticks"><li>${icon("check")}Everything in Individual</li><li>${icon("check")}Save ${esc(S.teamDiscountPct)}% per seat</li><li>${icon("check")}Shared workspace for the team</li><li>${icon("check")}2 private review slots</li></ul>
         ${applyBtn("Apply as a team", "btn-block", "team")}
@@ -398,7 +398,7 @@ export function renderPage(c) {
             <legend>Coming as <span class="req" aria-hidden="true">*</span></legend>
             <div class="seg">
               <label><input type="radio" name="coming_as" value="individual" checked><span>Individual</span></label>
-              <label><input type="radio" name="coming_as" value="team"><span>Team of 2–3</span></label>
+              <label><input type="radio" name="coming_as" value="team"><span>Team of 3+</span></label>
               <label class="seg-private" hidden><input type="radio" name="coming_as" value="private"><span>Private cohort</span></label>
             </div>
             <p class="err" id="e-type"></p>

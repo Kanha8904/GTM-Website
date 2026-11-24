@@ -28,7 +28,7 @@ export default {
     totalSeats: 12,
     applicationsCloseDate: "", // TODO [date] e.g. "30 Jan 2027". Empty = sentence left out.
     priceIndividual: "₹70,000", // TODO [₹ price] confirm Cohort 1 introductory price (carried over from the earlier pricing)
-    priceTeam: "₹60,000", //       TODO [₹ price] per person for a team of 2–3 (carried over; the earlier rule was 3+ seats)
+    priceTeam: "₹60,000", //       TODO [₹ price] per person for a team of 3+ (carried over)
     teamDiscountPct: 14, //        TODO [X]% saving per seat for teams
     fitCallUrl: "", // TODO booking link for the 15-min fit call (Calendly etc.). Empty = opens an email to contactEmail.
     clutchUrl: "https://clutch.co/profile/leadstrategus",
@@ -146,10 +146,10 @@ export default {
   who: {
     h2: "For serious practitioners who own pipeline.",
     cards: [
-      { icon: "rocket", title: "Founders selling B2B", text: "Need a repeatable way to create first meetings." },
+      { icon: "rocket", title: "Founders who sell B2B", text: "Need a repeatable way to create first meetings." },
+      { icon: "user-round", title: "GTM engineers and other GTM hires", text: "Know the tools; want the judgement behind them." },
       { icon: "briefcase", title: "Sales, demand-gen and RevOps leads", text: "Building or fixing an outbound motion." },
-      { icon: "user-round", title: "First GTM hires", text: "Know the tools; want the judgement behind them." },
-      { icon: "users", title: "Teams of 2–3", text: "Best results. Save {teamDiscountPct}% per seat.", link: "#pricing" },
+      { icon: "users", title: "Teams of 3+", text: "Best results. Save {teamDiscountPct}% per seat.", link: "#pricing" },
     ],
     note: "Not a tool certification. Not a placement programme.",
   },
@@ -236,7 +236,7 @@ export default {
   apply: {
     h2: "Tell us what you sell. We'll call within 48 hours.",
     sub: "Two minutes. We check fit before anyone pays.",
-    trust: ["NO PAYMENT TO APPLY", "GST INVOICE", "DAY-1 REFUND PROMISE"],
+    trust: ["NO PAYMENT TO APPLY", "GST INVOICE"],
     roles: ["Founder", "Sales or demand-gen lead", "RevOps", "First GTM hire", "Other"],
     success: "Application received. We'll call you within 48 hours to check fit.",
   },
@@ -266,7 +266,6 @@ export default {
     termsHtml: `
       <p><strong>Placeholder. Replace with the approved Terms, Cancellation, Refund and Substitution policy before launch.</strong></p>
       <p>There is no payment to apply. A seat is confirmed after a fit call, written confirmation from LeadStrategus and receipt of payment (Razorpay link, or bank transfer against a purchase order). A GST invoice is provided.</p>
-      <p>Day-1 refund promise: TODO, insert the exact terms.</p>
       <p>The workshop builds practical capability. It does not guarantee leads, meetings, pipeline, revenue, jobs or placement, and it is not a tool or vendor certification.</p>
       <p>Travel and accommodation are not included.</p>`,
   },

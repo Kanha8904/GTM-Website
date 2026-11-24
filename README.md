@@ -59,4 +59,4 @@ GA4, Meta Pixel and LinkedIn Insight load **only** when their IDs are set in `co
 - Cohort dates, seats left, close date, Cohort 1 prices and team discount
 - Fit-call booking link, checklist PDF and capture endpoint
 - Kirubakaran Periyaswamy's confirmed role title
-- Approved Privacy Notice and Terms/Refund text, including the Day-1 refund promise
+- Approved Privacy Notice and Terms/Refund text
